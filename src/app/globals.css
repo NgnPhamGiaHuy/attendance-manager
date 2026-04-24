@@ -1,26 +1,215 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-    --background: #ffffff;
-    --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ─── Claude-Inspired Design Tokens ───────────────────────────────── */
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* Brand Colors */
+    --color-terracotta: #c96442;
+    --color-parchment: #f5f4ed;
+    --color-ivory: #faf9f5;
+    --color-warm-sand: #e8e6dc;
+    --color-near-black: #141413;
+    --color-olive-gray: #5e5d59;
+    --color-stone-gray: #87867f;
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-3xl: 32px;
+
+    /* Typography */
+    --font-serif: "Anthropic Serif", Georgia, "Times New Roman", serif;
+    --font-sans:
+        "Anthropic Sans", system-ui, -apple-system, "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    --font-mono: "Anthropic Mono", "JetBrains Mono", "SF Mono", menlo, monospace;
+
+    /* Transitions */
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
+/* ─── Light Mode (Claude Warm) ────────────────────────────────────── */
+:root {
+    --background: #f5f4ed;
+    --foreground: #141413;
+    --card: #faf9f5;
+    --card-foreground: #141413;
+    --popover: #faf9f5;
+    --popover-foreground: #141413;
+
+    --primary: #c96442;
+    --primary-foreground: #faf9f5;
+    --secondary: #e8e6dc;
+    --secondary-foreground: #4d4c48;
+    --muted: #f0eee6;
+    --muted-foreground: #5e5d59;
+    --accent: #d97757;
+    --accent-foreground: #faf9f5;
+    --destructive: #b53333;
+    --border: #f0eee6;
+    --input: #e8e6dc;
+    --ring: #d1cfc5;
+
+    --sidebar: #faf9f5;
+    --sidebar-foreground: #141413;
+    --sidebar-primary: #c96442;
+    --sidebar-primary-foreground: #faf9f5;
+    --sidebar-accent: #f5f4ed;
+    --sidebar-accent-foreground: #141413;
+    --sidebar-border: #f0eee6;
+    --sidebar-ring: #d1cfc5;
+
+    /* Statuses - Warm variants */
+    --status-present: #16a34a;
+    --status-present-bg: #dcfce7;
+    --status-late: #d97706;
+    --status-late-bg: #fef3c7;
+    --status-absent: #dc2626;
+    --status-absent-bg: #fee2e2;
+    --status-excused: #7c3aed;
+    --status-excused-bg: #ede9fe;
+}
+
+/* ─── Dark Mode (Claude Night) ────────────────────────────────────── */
+.dark {
+    --background: #141413;
+    --foreground: #faf9f5;
+    --card: #30302e;
+    --card-foreground: #faf9f5;
+    --popover: #30302e;
+    --popover-foreground: #faf9f5;
+
+    --primary: #c96442;
+    --primary-foreground: #faf9f5;
+    --secondary: #30302e;
+    --secondary-foreground: #b0aea5;
+    --muted: #30302e;
+    --muted-foreground: #87867f;
+    --accent: #d97757;
+    --accent-foreground: #faf9f5;
+    --destructive: #b53333;
+    --border: #30302e;
+    --input: #30302e;
+    --ring: #c2c0b6;
+
+    --sidebar: #141413;
+    --sidebar-foreground: #faf9f5;
+    --sidebar-primary: #c96442;
+    --sidebar-primary-foreground: #faf9f5;
+    --sidebar-accent: #30302e;
+    --sidebar-accent-foreground: #faf9f5;
+    --sidebar-border: #30302e;
+    --sidebar-ring: #c2c0b6;
+}
+
+/* ─── Base Layer ─────────────────────────────────────────────────── */
+@layer base {
+    * {
+        @apply border-border/60 outline-ring/50;
+        box-sizing: border-box;
+    }
+
+    html {
+        @apply font-sans antialiased;
+        font-feature-settings: "kern" 1;
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-size: 16px;
+        line-height: 1.6; /* Claude's relaxed line-height */
+        letter-spacing: normal;
+        font-weight: 400;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-serif font-medium;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+    }
+
+    /* Accessibility focus ring */
+    :focus-visible {
+        outline: 2px solid #3898ec;
+        outline-offset: 2px;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-stone-gray/20 rounded-full;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-stone-gray/40;
     }
 }
 
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+/* ─── Claude-Specific Utility Layer ──────────────────────────────── */
+@layer utilities {
+    .text-display {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+        line-height: 1.1;
+    }
+
+    .text-heading {
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        line-height: 1.2;
+    }
+
+    .text-subheading {
+        font-size: clamp(1.25rem, 3vw, 1.6rem);
+        line-height: 1.3;
+    }
+
+    .whisper-shadow {
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+    }
+
+    .ring-shadow {
+        box-shadow: 0px 0px 0px 1px var(--ring);
+    }
+
+    .editorial-spacing {
+        @apply py-20 md:py-32;
+    }
 }

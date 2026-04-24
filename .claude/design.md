@@ -1,220 +1,312 @@
-# Design System Inspired by Figma
+# Design System Inspired by Claude (Anthropic)
 
 ## 1. Visual Theme & Atmosphere
 
-Figma's interface is the design tool that designed itself — a masterclass in typographic sophistication where a custom variable font (figmaSans) modulates between razor-thin (weight 320) and bold (weight 700) with stops at unusual intermediates (330, 340, 450, 480, 540) that most type systems never explore. This granular weight control gives every text element a precisely calibrated visual weight, creating hierarchy through micro-differences rather than the blunt instrument of "regular vs bold."
+Claude's interface is a literary salon reimagined as a product page — warm, unhurried, and quietly intellectual. The entire experience is built on a parchment-toned canvas (`#f5f4ed`) that deliberately evokes the feeling of high-quality paper rather than a digital surface. Where most AI product pages lean into cold, futuristic aesthetics, Claude's design radiates human warmth, as if the AI itself has good taste in interior design.
 
-The page presents a fascinating duality: the interface chrome is strictly black-and-white (literally only `#000000` and `#ffffff` detected as colors), while the hero section and product showcases explode with vibrant multi-color gradients — electric greens, bright yellows, deep purples, hot pinks. This separation means the design system itself is colorless, treating the product's colorful output as the hero content. Figma's marketing page is essentially a white gallery wall displaying colorful art.
+The signature move is the custom Anthropic Serif typeface — a medium-weight serif with generous proportions that gives every headline the gravitas of a book title. Combined with organic, hand-drawn-feeling illustrations in terracotta (`#c96442`), black, and muted green, the visual language says "thoughtful companion" rather than "powerful tool." The serif headlines breathe at tight-but-comfortable line-heights (1.10–1.30), creating a cadence that feels more like reading an essay than scanning a product page.
 
-What makes Figma distinctive beyond the variable font is its circle-and-pill geometry. Buttons use 50px radius (pill) or 50% (perfect circle for icon buttons), creating an organic, tool-palette-like feel. The dashed-outline focus indicator (`dashed 2px`) is a deliberate design choice that echoes selection handles in the Figma editor itself — the website's UI language references the product's UI language.
+What makes Claude's design truly distinctive is its warm neutral palette. Every gray has a yellow-brown undertone (`#5e5d59`, `#87867f`, `#4d4c48`) — there are no cool blue-grays anywhere. Borders are cream-tinted (`#f0eee6`, `#e8e6dc`), shadows use warm transparent blacks, and even the darkest surfaces (`#141413`, `#30302e`) carry a barely perceptible olive warmth. This chromatic consistency creates a space that feels lived-in and trustworthy.
 
 **Key Characteristics:**
-- Custom variable font (figmaSans) with unusual weight stops: 320, 330, 340, 450, 480, 540, 700
-- Strictly black-and-white interface chrome — color exists only in product content
-- figmaMono for uppercase technical labels with wide letter-spacing
-- Pill (50px) and circular (50%) button geometry
-- Dashed focus outlines echoing Figma's editor selection handles
-- Vibrant multi-color hero gradients (green, yellow, purple, pink)
-- OpenType `"kern"` feature enabled globally
-- Negative letter-spacing throughout — even body text at -0.14px to -0.26px
+- Warm parchment canvas (`#f5f4ed`) evoking premium paper, not screens
+- Custom Anthropic type family: Serif for headlines, Sans for UI, Mono for code
+- Terracotta brand accent (`#c96442`) — warm, earthy, deliberately un-tech
+- Exclusively warm-toned neutrals — every gray has a yellow-brown undertone
+- Organic, editorial illustrations replacing typical tech iconography
+- Ring-based shadow system (`0px 0px 0px 1px`) creating border-like depth without visible borders
+- Magazine-like pacing with generous section spacing and serif-driven hierarchy
 
 ## 2. Color Palette & Roles
 
 ### Primary
-- **Pure Black** (`#000000`): All text, all solid buttons, all borders. The sole "color" of the interface.
-- **Pure White** (`#ffffff`): All backgrounds, white buttons, text on dark surfaces. The other half of the binary.
+- **Anthropic Near Black** (`#141413`): The primary text color and dark-theme surface — not pure black but a warm, almost olive-tinted dark that's gentler on the eyes. The warmest "black" in any major tech brand.
+- **Terracotta Brand** (`#c96442`): The core brand color — a burnt orange-brown used for primary CTA buttons, brand moments, and the signature accent. Deliberately earthy and un-tech.
+- **Coral Accent** (`#d97757`): A lighter, warmer variant of the brand color used for text accents, links on dark surfaces, and secondary emphasis.
 
-*Note: Figma's marketing site uses ONLY these two colors for its interface layer. All vibrant colors appear exclusively in product screenshots, hero gradients, and embedded content.*
+### Secondary & Accent
+- **Error Crimson** (`#b53333`): A deep, warm red for error states — serious without being alarming.
+- **Focus Blue** (`#3898ec`): Standard blue for input focus rings — the only cool color in the entire system, used purely for accessibility.
 
 ### Surface & Background
-- **Pure White** (`#ffffff`): Primary page background and card surfaces.
-- **Glass Black** (`rgba(0, 0, 0, 0.08)`): Subtle dark overlay for secondary circular buttons and glass effects.
-- **Glass White** (`rgba(255, 255, 255, 0.16)`): Frosted glass overlay for buttons on dark/colored surfaces.
+- **Parchment** (`#f5f4ed`): The primary page background — a warm cream with a yellow-green tint that feels like aged paper. The emotional foundation of the entire design.
+- **Ivory** (`#faf9f5`): The lightest surface — used for cards and elevated containers on the Parchment background. Barely distinguishable but creates subtle layering.
+- **Pure White** (`#ffffff`): Reserved for specific button surfaces and maximum-contrast elements.
+- **Warm Sand** (`#e8e6dc`): Button backgrounds and prominent interactive surfaces — a noticeably warm light gray.
+- **Dark Surface** (`#30302e`): Dark-theme containers, nav borders, and elevated dark elements — warm charcoal.
+- **Deep Dark** (`#141413`): Dark-theme page background and primary dark surface.
+
+### Neutrals & Text
+- **Charcoal Warm** (`#4d4c48`): Button text on light warm surfaces — the go-to dark-on-light text.
+- **Olive Gray** (`#5e5d59`): Secondary body text — a distinctly warm medium-dark gray.
+- **Stone Gray** (`#87867f`): Tertiary text, footnotes, and de-emphasized metadata.
+- **Dark Warm** (`#3d3d3a`): Dark text links and emphasized secondary text.
+- **Warm Silver** (`#b0aea5`): Text on dark surfaces — a warm, parchment-tinted light gray.
+
+### Semantic & Accent
+- **Border Cream** (`#f0eee6`): Standard light-theme border — barely visible warm cream, creating the gentlest possible containment.
+- **Border Warm** (`#e8e6dc`): Prominent borders, section dividers, and emphasized containment on light surfaces.
+- **Border Dark** (`#30302e`): Standard border on dark surfaces — maintains the warm tone.
+- **Ring Warm** (`#d1cfc5`): Shadow ring color for button hover/focus states.
+- **Ring Subtle** (`#dedc01`): Secondary ring variant for lighter interactive surfaces.
+- **Ring Deep** (`#c2c0b6`): Deeper ring for active/pressed states.
 
 ### Gradient System
-- **Hero Gradient**: A vibrant multi-stop gradient using electric green, bright yellow, deep purple, and hot pink. This gradient is the visual signature of the hero section — it represents the creative possibilities of the tool.
-- **Product Section Gradients**: Individual product areas (Design, Dev Mode, Prototyping) may use distinct color themes in their showcases.
+- Claude's design is **gradient-free** in the traditional sense. Depth and visual richness come from the interplay of warm surface tones, organic illustrations, and light/dark section alternation. The warm palette itself creates a "gradient" effect as the eye moves through cream → sand → stone → charcoal → black sections.
 
 ## 3. Typography Rules
 
 ### Font Family
-- **Primary**: `figmaSans`, with fallbacks: `figmaSans Fallback, SF Pro Display, system-ui, helvetica`
-- **Monospace / Labels**: `figmaMono`, with fallbacks: `figmaMono Fallback, SF Mono, menlo`
+- **Headline**: `Anthropic Serif`, with fallback: `Georgia`
+- **Body / UI**: `Anthropic Sans`, with fallback: `Arial`
+- **Code**: `Anthropic Mono`, with fallback: `Arial`
+
+*Note: These are custom typefaces. For external implementations, Georgia serves as the serif substitute and system-ui/Inter as the sans substitute.*
 
 ### Hierarchy
 
 | Role | Font | Size | Weight | Line Height | Letter Spacing | Notes |
 |------|------|------|--------|-------------|----------------|-------|
-| Display / Hero | figmaSans | 86px (5.38rem) | 400 | 1.00 (tight) | -1.72px | Maximum impact, extreme tracking |
-| Section Heading | figmaSans | 64px (4rem) | 400 | 1.10 (tight) | -0.96px | Feature section titles |
-| Sub-heading | figmaSans | 26px (1.63rem) | 540 | 1.35 | -0.26px | Emphasized section text |
-| Sub-heading Light | figmaSans | 26px (1.63rem) | 340 | 1.35 | -0.26px | Light-weight section text |
-| Feature Title | figmaSans | 24px (1.5rem) | 700 | 1.45 | normal | Bold card headings |
-| Body Large | figmaSans | 20px (1.25rem) | 330–450 | 1.30–1.40 | -0.1px to -0.14px | Descriptions, intros |
-| Body / Button | figmaSans | 16px (1rem) | 330–400 | 1.40–1.45 | -0.14px to normal | Standard body, nav, buttons |
-| Body Light | figmaSans | 18px (1.13rem) | 320 | 1.45 | -0.26px to normal | Light-weight body text |
-| Mono Label | figmaMono | 18px (1.13rem) | 400 | 1.30 (tight) | 0.54px | Uppercase section labels |
-| Mono Small | figmaMono | 12px (0.75rem) | 400 | 1.00 (tight) | 0.6px | Uppercase tiny tags |
+| Display / Hero | Anthropic Serif | 64px (4rem) | 500 | 1.10 (tight) | normal | Maximum impact, book-title presence |
+| Section Heading | Anthropic Serif | 52px (3.25rem) | 500 | 1.20 (tight) | normal | Feature section anchors |
+| Sub-heading Large | Anthropic Serif | 36–36.8px (~2.3rem) | 500 | 1.30 | normal | Secondary section markers |
+| Sub-heading | Anthropic Serif | 32px (2rem) | 500 | 1.10 (tight) | normal | Card titles, feature names |
+| Sub-heading Small | Anthropic Serif | 25–25.6px (~1.6rem) | 500 | 1.20 | normal | Smaller section titles |
+| Feature Title | Anthropic Serif | 20.8px (1.3rem) | 500 | 1.20 | normal | Small feature headings |
+| Body Serif | Anthropic Serif | 17px (1.06rem) | 400 | 1.60 (relaxed) | normal | Serif body text (editorial passages) |
+| Body Large | Anthropic Sans | 20px (1.25rem) | 400 | 1.60 (relaxed) | normal | Intro paragraphs |
+| Body / Nav | Anthropic Sans | 17px (1.06rem) | 400–500 | 1.00–1.60 | normal | Navigation links, UI text |
+| Body Standard | Anthropic Sans | 16px (1rem) | 400–500 | 1.25–1.60 | normal | Standard body, button text |
+| Body Small | Anthropic Sans | 15px (0.94rem) | 400–500 | 1.00–1.60 | normal | Compact body text |
+| Caption | Anthropic Sans | 14px (0.88rem) | 400 | 1.43 | normal | Metadata, descriptions |
+| Label | Anthropic Sans | 12px (0.75rem) | 400–500 | 1.25–1.60 | 0.12px | Badges, small labels |
+| Overline | Anthropic Sans | 10px (0.63rem) | 400 | 1.60 | 0.5px | Uppercase overline labels |
+| Micro | Anthropic Sans | 9.6px (0.6rem) | 400 | 1.60 | 0.096px | Smallest text |
+| Code | Anthropic Mono | 15px (0.94rem) | 400 | 1.60 | -0.32px | Inline code, terminal |
 
 ### Principles
-- **Variable font precision**: figmaSans uses weights that most systems never touch — 320, 330, 340, 450, 480, 540. This creates hierarchy through subtle weight differences rather than dramatic jumps. The difference between 330 and 340 is nearly imperceptible but structurally significant.
-- **Light as the base**: Most body text uses 320–340 (lighter than typical 400 "regular"), creating an ethereal, airy reading experience that matches the design-tool aesthetic.
-- **Kern everywhere**: Every text element enables OpenType `"kern"` feature — kerning is not optional, it's structural.
-- **Negative tracking by default**: Even body text uses -0.1px to -0.26px letter-spacing, creating universally tight text. Display text compresses further to -0.96px and -1.72px.
-- **Mono for structure**: figmaMono in uppercase with positive letter-spacing (0.54px–0.6px) creates technical signpost labels.
+- **Serif for authority, sans for utility**: Anthropic Serif carries all headline content with medium weight (500), giving every heading the gravitas of a published title. Anthropic Sans handles all functional UI text — buttons, labels, navigation — with quiet efficiency.
+- **Single weight for serifs**: All Anthropic Serif headings use weight 500 — no bold, no light. This creates a consistent "voice" across all headline sizes, as if the same author wrote every heading.
+- **Relaxed body line-height**: Most body text uses 1.60 line-height — significantly more generous than typical tech sites (1.4–1.5). This creates a reading experience closer to a book than a dashboard.
+- **Tight-but-not-compressed headings**: Line-heights of 1.10–1.30 for headings are tight but never claustrophobic. The serif letterforms need breathing room that sans-serif fonts don't.
+- **Micro letter-spacing on labels**: Small sans text (12px and below) uses deliberate letter-spacing (0.12px–0.5px) to maintain readability at tiny sizes.
 
 ## 4. Component Stylings
 
 ### Buttons
 
-**Black Solid (Pill)**
-- Background: Pure Black (`#000000`)
-- Text: Pure White (`#ffffff`)
-- Radius: circle (50%) for icon buttons
-- Focus: dashed 2px outline
-- Maximum emphasis
+**Warm Sand (Secondary)**
+- Background: Warm Sand (`#e8e6dc`)
+- Text: Charcoal Warm (`#4d4c48`)
+- Padding: 0px 12px 0px 8px (asymmetric — icon-first layout)
+- Radius: comfortably rounded (8px)
+- Shadow: ring-based (`#e8e6dc 0px 0px 0px 0px, #d1cfc5 0px 0px 0px 1px`)
+- The workhorse button — warm, unassuming, clearly interactive
 
-**White Pill**
+**White Surface**
 - Background: Pure White (`#ffffff`)
-- Text: Pure Black (`#000000`)
-- Padding: 8px 18px 10px (asymmetric vertical)
-- Radius: pill (50px)
-- Focus: dashed 2px outline
-- Standard CTA on dark/colored surfaces
+- Text: Anthropic Near Black (`#141413`)
+- Padding: 8px 16px 8px 12px
+- Radius: generously rounded (12px)
+- Hover: shifts to secondary background color
+- Clean, elevated button for light surfaces
 
-**Glass Dark**
-- Background: `rgba(0, 0, 0, 0.08)` (subtle dark overlay)
-- Text: Pure Black
-- Radius: circle (50%)
-- Focus: dashed 2px outline
-- Secondary action on light surfaces
+**Dark Charcoal**
+- Background: Dark Surface (`#30302e`)
+- Text: Ivory (`#faf9f5`)
+- Padding: 0px 12px 0px 8px
+- Radius: comfortably rounded (8px)
+- Shadow: ring-based (`#30302e 0px 0px 0px 0px, ring 0px 0px 0px 1px`)
+- The inverted variant for dark-on-light emphasis
 
-**Glass Light**
-- Background: `rgba(255, 255, 255, 0.16)` (frosted glass)
-- Text: Pure White
-- Radius: circle (50%)
-- Focus: dashed 2px outline
-- Secondary action on dark/colored surfaces
+**Brand Terracotta**
+- Background: Terracotta Brand (`#c96442`)
+- Text: Ivory (`#faf9f5`)
+- Radius: 8–12px
+- Shadow: ring-based (`#c96442 0px 0px 0px 0px, #c96442 0px 0px 0px 1px`)
+- The primary CTA — the only button with chromatic color
+
+**Dark Primary**
+- Background: Anthropic Near Black (`#141413`)
+- Text: Warm Silver (`#b0aea5`)
+- Padding: 9.6px 16.8px
+- Radius: generously rounded (12px)
+- Border: thin solid Dark Surface (`1px solid #30302e`)
+- Used on dark theme surfaces
 
 ### Cards & Containers
-- Background: Pure White
-- Border: none or minimal
-- Radius: 6px (small containers), 8px (images, cards, dialogs)
-- Shadow: subtle to medium elevation effects
-- Product screenshots as card content
+- Background: Ivory (`#faf9f5`) or Pure White (`#ffffff`) on light surfaces; Dark Surface (`#30302e`) on dark
+- Border: thin solid Border Cream (`1px solid #f0eee6`) on light; `1px solid #30302e` on dark
+- Radius: comfortably rounded (8px) for standard cards; generously rounded (16px) for featured; very rounded (32px) for hero containers and embedded media
+- Shadow: whisper-soft (`rgba(0,0,0,0.05) 0px 4px 24px`) for elevated content
+- Ring shadow: `0px 0px 0px 1px` patterns for interactive card states
+- Section borders: `1px 0px 0px` (top-only) for list item separators
+
+### Inputs & Forms
+- Text: Anthropic Near Black (`#141413`)
+- Padding: 1.6px 12px (very compact vertical)
+- Border: standard warm borders
+- Focus: ring with Focus Blue (`#3898ec`) border-color — the only cool color moment
+- Radius: generously rounded (12px)
 
 ### Navigation
-- Clean horizontal nav on white
-- Logo: Figma wordmark in black
-- Product tabs: pill-shaped (50px) tab navigation
-- Links: black text, underline 1px decoration
-- CTA: Black pill button
-- Hover: text color via CSS variable
+- Sticky top nav with warm background
+- Logo: Claude wordmark in Anthropic Near Black
+- Links: mix of Near Black (`#141413`), Olive Gray (`#5e5d59`), and Dark Warm (`#3d3d3a`)
+- Nav border: `1px solid #30302e` (dark) or `1px solid #f0eee6` (light)
+- CTA: Terracotta Brand button or White Surface button
+- Hover: text shifts to foreground-primary, no decoration
+
+### Image Treatment
+- Product screenshots showing the Claude chat interface
+- Generous border-radius on media (16–32px)
+- Embedded video players with rounded corners
+- Dark UI screenshots provide contrast against warm light canvas
+- Organic, hand-drawn illustrations for conceptual sections
 
 ### Distinctive Components
 
-**Product Tab Bar**
-- Horizontal pill-shaped tabs (50px radius)
-- Each tab represents a Figma product area (Design, Dev Mode, Prototyping, etc.)
-- Active tab highlighted
+**Model Comparison Cards**
+- Opus 4.5, Sonnet 4.5, Haiku 4.5 presented in a clean card grid
+- Each model gets a bordered card with name, description, and capability badges
+- Border Warm (`#e8e6dc`) separation between items
 
-**Hero Gradient Section**
-- Full-width vibrant multi-color gradient background
-- White text overlay with 86px display heading
-- Product screenshots floating within the gradient
+**Organic Illustrations**
+- Hand-drawn-feeling vector illustrations in terracotta, black, and muted green
+- Abstract, conceptual rather than literal product diagrams
+- The primary visual personality — no other AI company uses this style
 
-**Dashed Focus Indicators**
-- All interactive elements use `dashed 2px` outline on focus
-- References the selection handles in the Figma editor
-- A meta-design choice connecting website and product
+**Dark/Light Section Alternation**
+- The page alternates between Parchment light and Near Black dark sections
+- Creates a reading rhythm like chapters in a book
+- Each section feels like a distinct environment
 
 ## 5. Layout Principles
 
 ### Spacing System
 - Base unit: 8px
-- Scale: 1px, 2px, 4px, 4.5px, 8px, 10px, 12px, 16px, 18px, 24px, 32px, 40px, 46px, 48px, 50px
+- Scale: 3px, 4px, 6px, 8px, 10px, 12px, 16px, 20px, 24px, 30px
+- Button padding: asymmetric (0px 12px 0px 8px) or balanced (8px 16px)
+- Card internal padding: approximately 24–32px
+- Section vertical spacing: generous (estimated 80–120px between major sections)
 
 ### Grid & Container
-- Max container width: up to 1920px
-- Hero: full-width gradient with centered content
-- Product sections: alternating showcases
-- Footer: dark full-width section
-- Responsive from 559px to 1920px
+- Max container width: approximately 1200px, centered
+- Hero: centered with editorial layout
+- Feature sections: single-column or 2–3 column card grids
+- Model comparison: clean 3-column grid
+- Full-width dark sections breaking the container for emphasis
 
 ### Whitespace Philosophy
-- **Gallery-like pacing**: Generous spacing lets each product section breathe as its own exhibit.
-- **Color sections as visual breathing**: The gradient hero and product showcases provide chromatic relief between the monochrome interface sections.
+- **Editorial pacing**: Each section breathes like a magazine spread — generous top/bottom margins create natural reading pauses.
+- **Serif-driven rhythm**: The serif headings establish a literary cadence that demands more whitespace than sans-serif designs.
+- **Content island approach**: Sections alternate between light and dark environments, creating distinct "rooms" for each message.
 
 ### Border Radius Scale
-- Minimal (2px): Small link elements
-- Subtle (6px): Small containers, dividers
-- Comfortable (8px): Cards, images, dialogs
-- Pill (50px): Tab buttons, CTAs
-- Circle (50%): Icon buttons, circular elements
+- Sharp (4px): Minimal inline elements
+- Subtly rounded (6–7.5px): Small buttons, secondary interactive elements
+- Comfortably rounded (8–8.5px): Standard buttons, cards, containers
+- Generously rounded (12px): Primary buttons, input fields, nav elements
+- Very rounded (16px): Featured containers, video players, tab lists
+- Highly rounded (24px): Tag-like elements, highlighted containers
+- Maximum rounded (32px): Hero containers, embedded media, large cards
 
 ## 6. Depth & Elevation
 
 | Level | Treatment | Use |
 |-------|-----------|-----|
-| Flat (Level 0) | No shadow | Page background, most text |
-| Surface (Level 1) | White card on gradient/dark section | Cards, product showcases |
-| Elevated (Level 2) | Subtle shadow | Floating cards, hover states |
+| Flat (Level 0) | No shadow, no border | Parchment background, inline text |
+| Contained (Level 1) | `1px solid #f0eee6` (light) or `1px solid #30302e` (dark) | Standard cards, sections |
+| Ring (Level 2) | `0px 0px 0px 1px` ring shadows using warm grays | Interactive cards, buttons, hover states |
+| Whisper (Level 3) | `rgba(0,0,0,0.05) 0px 4px 24px` | Elevated feature cards, product screenshots |
+| Inset (Level 4) | `inset 0px 0px 0px 1px` at 15% opacity | Active/pressed button states |
 
-**Shadow Philosophy**: Figma uses shadows sparingly. The primary depth mechanisms are **background contrast** (white content on colorful/dark sections) and the inherent dimensionality of the product screenshots themselves.
+**Shadow Philosophy**: Claude communicates depth through **warm-toned ring shadows** rather than traditional drop shadows. The signature `0px 0px 0px 1px` pattern creates a border-like halo that's softer than an actual border — it's a shadow pretending to be a border, or a border that's technically a shadow. When drop shadows do appear, they're extremely soft (0.05 opacity, 24px blur) — barely visible lifts that suggest floating rather than casting.
+
+### Decorative Depth
+- **Light/Dark alternation**: The most dramatic depth effect comes from alternating between Parchment (`#f5f4ed`) and Near Black (`#141413`) sections — entire sections shift elevation by changing the ambient light level.
+- **Warm ring halos**: Button and card interactions use ring shadows that match the warm palette — never cool-toned or generic gray.
 
 ## 7. Do's and Don'ts
 
 ### Do
-- Use figmaSans with precise variable weights (320–540) — the granular weight control IS the design
-- Keep the interface strictly black-and-white — color comes from product content only
-- Use pill (50px) and circular (50%) geometry for all interactive elements
-- Apply dashed 2px focus outlines — the signature accessibility pattern
-- Enable `"kern"` feature on all text
-- Use figmaMono in uppercase with positive letter-spacing for labels
-- Apply negative letter-spacing throughout (-0.1px to -1.72px)
+- Use Parchment (`#f5f4ed`) as the primary light background — the warm cream tone IS the Claude personality
+- Use Anthropic Serif at weight 500 for all headlines — the single-weight consistency is intentional
+- Use Terracotta Brand (`#c96442`) only for primary CTAs and the highest-signal brand moments
+- Keep all neutrals warm-toned — every gray should have a yellow-brown undertone
+- Use ring shadows (`0px 0px 0px 1px`) for interactive element states instead of drop shadows
+- Maintain the editorial serif/sans hierarchy — serif for content headlines, sans for UI
+- Use generous body line-height (1.60) for a literary reading experience
+- Alternate between light and dark sections to create chapter-like page rhythm
+- Apply generous border-radius (12–32px) for a soft, approachable feel
 
 ### Don't
-- Don't add interface colors — the monochrome palette is absolute
-- Don't use standard font weights (400, 500, 600, 700) — use the variable font's unique stops (320, 330, 340, 450, 480, 540)
-- Don't use sharp corners on buttons — pill and circular geometry only
-- Don't use solid focus outlines — dashed is the signature
-- Don't increase body font weight above 450 — the light-weight aesthetic is core
-- Don't use positive letter-spacing on body text — it's always negative
+- Don't use cool blue-grays anywhere — the palette is exclusively warm-toned
+- Don't use bold (700+) weight on Anthropic Serif — weight 500 is the ceiling for serifs
+- Don't introduce saturated colors beyond Terracotta — the palette is deliberately muted
+- Don't use sharp corners (< 6px radius) on buttons or cards — softness is core to the identity
+- Don't apply heavy drop shadows — depth comes from ring shadows and background color shifts
+- Don't use pure white (`#ffffff`) as a page background — Parchment (`#f5f4ed`) or Ivory (`#faf9f5`) are always warmer
+- Don't use geometric/tech-style illustrations — Claude's illustrations are organic and hand-drawn-feeling
+- Don't reduce body line-height below 1.40 — the generous spacing supports the editorial personality
+- Don't use monospace fonts for non-code content — Anthropic Mono is strictly for code
+- Don't mix in sans-serif for headlines — the serif/sans split is the typographic identity
 
 ## 8. Responsive Behavior
 
 ### Breakpoints
 | Name | Width | Key Changes |
 |------|-------|-------------|
-| Small Mobile | <560px | Compact layout, stacked |
-| Tablet | 560–768px | Minor adjustments |
-| Small Desktop | 768–960px | 2-column layouts |
-| Desktop | 960–1280px | Standard layout |
-| Large Desktop | 1280–1440px | Expanded |
-| Ultra-wide | 1440–1920px | Maximum width |
+| Small Mobile | <479px | Minimum layout, stacked everything, compact typography |
+| Mobile | 479–640px | Single column, hamburger nav, reduced heading sizes |
+| Large Mobile | 640–767px | Slightly wider content area |
+| Tablet | 768–991px | 2-column grids begin, condensed nav |
+| Desktop | 992px+ | Full multi-column layout, expanded nav, maximum hero typography (64px) |
+
+### Touch Targets
+- Buttons use generous padding (8–16px vertical minimum)
+- Navigation links adequately spaced for thumb navigation
+- Card surfaces serve as large touch targets
+- Minimum recommended: 44x44px
 
 ### Collapsing Strategy
-- Hero text: 86px → 64px → 48px
-- Product tabs: horizontal scroll on mobile
-- Feature sections: stacked single column
-- Footer: multi-column → stacked
+- **Navigation**: Full horizontal nav collapses to hamburger on mobile
+- **Feature sections**: Multi-column → stacked single column
+- **Hero text**: 64px → 36px → ~25px progressive scaling
+- **Model cards**: 3-column → stacked vertical
+- **Section padding**: Reduces proportionally but maintains editorial rhythm
+- **Illustrations**: Scale proportionally, maintain aspect ratios
+
+### Image Behavior
+- Product screenshots scale proportionally within rounded containers
+- Illustrations maintain quality at all sizes
+- Video embeds maintain 16:9 aspect ratio with rounded corners
+- No art direction changes between breakpoints
 
 ## 9. Agent Prompt Guide
 
 ### Quick Color Reference
-- Everything: "Pure Black (#000000)" and "Pure White (#ffffff)"
-- Glass Dark: "rgba(0, 0, 0, 0.08)"
-- Glass Light: "rgba(255, 255, 255, 0.16)"
+- Brand CTA: "Terracotta Brand (#c96442)"
+- Page Background: "Parchment (#f5f4ed)"
+- Card Surface: "Ivory (#faf9f5)"
+- Primary Text: "Anthropic Near Black (#141413)"
+- Secondary Text: "Olive Gray (#5e5d59)"
+- Tertiary Text: "Stone Gray (#87867f)"
+- Borders (light): "Border Cream (#f0eee6)"
+- Dark Surface: "Dark Surface (#30302e)"
 
 ### Example Component Prompts
-- "Create a hero on a vibrant multi-color gradient (green, yellow, purple, pink). Headline at 86px figmaSans weight 400, line-height 1.0, letter-spacing -1.72px. White text. White pill CTA button (50px radius, 8px 18px padding)."
-- "Design a product tab bar with pill-shaped buttons (50px radius). Active: Black bg, white text. Inactive: transparent, black text. figmaSans at 20px weight 480."
-- "Build a section label: figmaMono 18px, uppercase, letter-spacing 0.54px, black text. Kern enabled."
-- "Create body text at 20px figmaSans weight 330, line-height 1.40, letter-spacing -0.14px. Pure Black on white."
+- "Create a hero section on Parchment (#f5f4ed) with a headline at 64px Anthropic Serif weight 500, line-height 1.10. Use Anthropic Near Black (#141413) text. Add a subtitle in Olive Gray (#5e5d59) at 20px Anthropic Sans with 1.60 line-height. Place a Terracotta Brand (#c96442) CTA button with Ivory text, 12px radius."
+- "Design a feature card on Ivory (#faf9f5) with a 1px solid Border Cream (#f0eee6) border and comfortably rounded corners (8px). Title in Anthropic Serif at 25px weight 500, description in Olive Gray (#5e5d59) at 16px Anthropic Sans. Add a whisper shadow (rgba(0,0,0,0.05) 0px 4px 24px)."
+- "Build a dark section on Anthropic Near Black (#141413) with Ivory (#faf9f5) headline text in Anthropic Serif at 52px weight 500. Use Warm Silver (#b0aea5) for body text. Borders in Dark Surface (#30302e)."
+- "Create a button in Warm Sand (#e8e6dc) with Charcoal Warm (#4d4c48) text, 8px radius, and a ring shadow (0px 0px 0px 1px #d1cfc5). Padding: 0px 12px 0px 8px."
+- "Design a model comparison grid with three cards on Ivory surfaces. Each card gets a Border Warm (#e8e6dc) top border, model name in Anthropic Serif at 25px, and description in Olive Gray at 15px Anthropic Sans."
 
 ### Iteration Guide
-1. Use variable font weight stops precisely: 320, 330, 340, 450, 480, 540, 700
-2. Interface is always black + white — never add colors to chrome
-3. Dashed focus outlines, not solid
-4. Letter-spacing is always negative on body, always positive on mono labels
-5. Pill (50px) for buttons/tabs, circle (50%) for icon buttons
+1. Focus on ONE component at a time
+2. Reference specific color names — "use Olive Gray (#5e5d59)" not "make it gray"
+3. Always specify warm-toned variants — no cool grays
+4. Describe serif vs sans usage explicitly — "Anthropic Serif for the heading, Anthropic Sans for the label"
+5. For shadows, use "ring shadow (0px 0px 0px 1px)" or "whisper shadow" — never generic "drop shadow"
+6. Specify the warm background — "on Parchment (#f5f4ed)" or "on Near Black (#141413)"
+7. Keep illustrations organic and conceptual — describe "hand-drawn-feeling" style
