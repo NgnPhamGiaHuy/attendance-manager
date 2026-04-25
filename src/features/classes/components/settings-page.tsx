@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea/dnd";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertTriangle, GripVertical, Loader2, Plus, Save } from "lucide-react";
+import { AlertTriangle, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -24,11 +22,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { StatusBadge } from "@/components/ui/status-chip";
 import { Text } from "@/components/ui/typography";
+import { ScoringRulesForm } from "@/features/classes/components/scoring-rules-form";
+import { StatusEditor } from "@/features/classes/components/status-editor";
 import { useClass, useUpdateClass } from "@/features/classes/hooks/useClasses";
-
-import type { StatusDefinition } from "@/types";
 
 // ─── Details Form ─────────────────────────────────────────────────────────────
 
@@ -198,162 +195,6 @@ function ClassDetailsForm({
     );
 }
 
-// ─── Status Definitions ───────────────────────────────────────────────────────
-
-function StatusSettings({
-    classId,
-    statusMap,
-}: {
-    classId: string;
-    statusMap: Record<string, StatusDefinition>;
-}) {
-    const updateClass = useUpdateClass();
-    const [statuses, setStatuses] = useState<StatusDefinition[]>(() =>
-        Object.values(statusMap).sort((a, b) => a.order - b.order),
-    );
-
-    const onDragEnd = async (result: DropResult) => {
-        if (!result.destination) return;
-
-        const items = Array.from(statuses);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-
-        // Update local order
-        const reordered = items.map((item, index) => ({ ...item, order: index }));
-        setStatuses(reordered);
-
-        // Save to Firestore
-        const newMap = reordered.reduce(
-            (acc, curr) => {
-                acc[curr.id] = curr;
-                return acc;
-            },
-            {} as Record<string, StatusDefinition>,
-        );
-
-        try {
-            await updateClass.mutateAsync({ id: classId, data: { statusDefinitions: newMap } });
-            toast.success("Status order saved.");
-        } catch {
-            toast.error("Failed to save status order.");
-            setStatuses(Object.values(statusMap).sort((a, b) => a.order - b.order));
-        }
-    };
-
-    return (
-        <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
-            <CardHeader className="px-10 pt-10 pb-2">
-                <CardTitle size="6" className="font-serif">
-                    Attendance Statuses
-                </CardTitle>
-                <CardDescription className="leading-relaxed">
-                    Drag to reorder how statuses appear during attendance taking. The first item is
-                    usually your default status (e.g. Present).
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="px-10 pt-6 pb-10">
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId="statuses">
-                        {(provided) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                className="space-y-3"
-                            >
-                                {statuses.map((status, index) => (
-                                    <Draggable
-                                        key={status.id}
-                                        draggableId={status.id}
-                                        index={index}
-                                    >
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                className={`bg-background flex items-center gap-4 rounded-2xl border p-4 transition-all duration-200 ${
-                                                    snapshot.isDragging
-                                                        ? "border-terracotta/30 ring-terracotta/5 z-50 scale-[1.02] shadow-xl ring-4"
-                                                        : "border-border/30 hover:border-border/60 hover:shadow-sm"
-                                                }`}
-                                            >
-                                                <div
-                                                    {...provided.dragHandleProps}
-                                                    className="text-stone-gray/40 hover:text-stone-gray cursor-grab p-1 transition-colors active:cursor-grabbing"
-                                                >
-                                                    <GripVertical className="h-5 w-5" />
-                                                </div>
-                                                <div className="flex flex-1 items-center gap-8">
-                                                    <div className="flex min-w-[140px] items-center gap-3.5">
-                                                        <StatusBadge
-                                                            label={status.label}
-                                                            acronym={status.acronym}
-                                                            color={status.color}
-                                                        />
-                                                        <Text size="4" weight="semibold">
-                                                            {status.label}
-                                                        </Text>
-                                                    </div>
-                                                    <div className="flex items-center gap-8">
-                                                        <div className="flex items-center gap-2">
-                                                            <Text
-                                                                size="1"
-                                                                weight="bold"
-                                                                color="stone"
-                                                                className="tracking-widest uppercase opacity-60"
-                                                            >
-                                                                Multiplier
-                                                            </Text>
-                                                            <Text
-                                                                size="2"
-                                                                weight="bold"
-                                                                className="font-mono"
-                                                            >
-                                                                {status.multiplier}x
-                                                            </Text>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <Text
-                                                                size="1"
-                                                                weight="bold"
-                                                                color="stone"
-                                                                className="tracking-widest uppercase opacity-60"
-                                                            >
-                                                                Absence Weight
-                                                            </Text>
-                                                            <Text
-                                                                size="2"
-                                                                weight="bold"
-                                                                className="font-mono"
-                                                            >
-                                                                {status.absenceWeight}
-                                                            </Text>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-                <div className="mt-10 flex">
-                    <Button
-                        variant="outline"
-                        disabled
-                        className="border-border/60 text-stone-gray h-12 w-full rounded-2xl border-dashed bg-transparent px-8 sm:w-auto"
-                    >
-                        <Plus className="mr-2.5 h-4 w-4" /> Add Custom Status (Coming Soon)
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
-
 // ─── Danger Zone ──────────────────────────────────────────────────────────────
 
 function DangerZone({ classId }: { classId: string }) {
@@ -424,7 +265,7 @@ function DangerZone({ classId }: { classId: string }) {
 // ─── Settings Page ────────────────────────────────────────────────────────────
 
 export function SettingsPage({ classId }: { classId: string }) {
-    const { data: classData } = useClass(classId);
+    const { data: classData, refetch } = useClass(classId);
 
     return (
         <div className="animate-fade-in max-w-4xl space-y-10 pb-12">
@@ -437,7 +278,24 @@ export function SettingsPage({ classId }: { classId: string }) {
                     defaultEndTime: classData.defaultEndTime,
                 }}
             />
-            <StatusSettings classId={classId} statusMap={classData.statusDefinitions} />
+            <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
+                <CardContent className="px-10 pt-10 pb-10">
+                    <StatusEditor
+                        classId={classId}
+                        statuses={classData.statusDefinitions}
+                        onUpdate={() => refetch()}
+                    />
+                </CardContent>
+            </Card>
+            <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
+                <CardContent className="px-10 pt-10 pb-10">
+                    <ScoringRulesForm
+                        classId={classId}
+                        currentRules={classData.scoringRules}
+                        onUpdate={() => refetch()}
+                    />
+                </CardContent>
+            </Card>
             <DangerZone classId={classId} />
         </div>
     );

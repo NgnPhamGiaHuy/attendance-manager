@@ -31,7 +31,7 @@ export function TopBar({ title }: TopBarProps) {
     const { user } = useAuth();
 
     return (
-        <header className="border-border/40 bg-background/95 sticky top-0 z-[200] flex h-16 items-center border-b px-6 backdrop-blur-sm">
+        <header className="border-border/40 bg-background/95 sticky top-0 z-10 flex h-16 items-center border-b px-6 backdrop-blur-sm">
             <div className="flex flex-1 items-center gap-4">
                 <Logo href="/dashboard" className="origin-left scale-90" />
 
@@ -207,7 +207,7 @@ export function PageHeader({ title, description, actions, className }: PageHeade
 export function AppShellSkeleton() {
     return (
         <div className="bg-background flex min-h-screen flex-col">
-            <div className="border-border/40 bg-background/80 sticky top-0 z-[200] h-16 border-b backdrop-blur-sm" />
+            <div className="border-border/40 bg-background/80 sticky top-0 z-10 h-16 border-b backdrop-blur-sm" />
             <div className="mx-auto w-full max-w-6xl px-8 py-12">
                 <div className="bg-ivory ring-border/20 h-14 w-64 animate-pulse rounded-2xl ring-1" />
                 <div className="bg-ivory/50 ring-border/20 mt-4 h-6 w-96 animate-pulse rounded-xl ring-1" />

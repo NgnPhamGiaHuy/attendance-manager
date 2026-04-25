@@ -1,5 +1,4 @@
 import {
-    addDoc,
     doc,
     documentId,
     getDoc,
@@ -15,7 +14,7 @@ import {
 
 import { Collections } from "@/lib/collections";
 import { generateClassCode } from "@/lib/utils";
-import { Class, DEFAULT_STATUSES, StatusDefinition } from "@/types";
+import { Class, DEFAULT_STATUSES, ScoringRules, StatusDefinition } from "@/types";
 
 export const classApi = {
     /**
@@ -133,7 +132,7 @@ export const classApi = {
                 penaltyPerAbsence: 5,
                 capAtZero: true,
             },
-            memberCount: 1, // Owner counts as a member
+            memberCount: 1,
             sessionCount: 0,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
@@ -210,5 +209,246 @@ export const classApi = {
         });
 
         return classId;
+    },
+
+    /**
+     * Add a new status definition to a class.
+     * Validates uniqueness of label and acronym among non-archived statuses.
+     * Assigns next available order number automatically.
+     *
+     * @throws Error if label or acronym already exists (non-archived)
+     * @throws Error if validation fails
+     *
+     * @example
+     * await classApi.addStatus(classId, {
+     *   label: "Remote",
+     *   acronym: "R",
+     *   color: "#3b82f6",
+     *   multiplier: 1.0,
+     *   absenceWeight: 0,
+     *   isDefault: false
+     * });
+     */
+    addStatus: async (
+        classId: string,
+        newStatus: Omit<StatusDefinition, "id" | "order">,
+    ): Promise<string> => {
+        // Fetch current class to validate
+        const classDoc = await classApi.getClassById(classId);
+        const existingStatuses = classDoc.statusDefinitions || {};
+
+        // Validate uniqueness among non-archived statuses
+        const activeStatuses = Object.values(existingStatuses).filter((s) => !s.isArchived);
+        const labelExists = activeStatuses.some(
+            (s) => s.label.toLowerCase() === newStatus.label.toLowerCase(),
+        );
+        const acronymExists = activeStatuses.some(
+            (s) => s.acronym.toLowerCase() === newStatus.acronym.toLowerCase(),
+        );
+
+        if (labelExists) {
+            throw new Error(`Status label "${newStatus.label}" already exists.`);
+        }
+        if (acronymExists) {
+            throw new Error(`Status acronym "${newStatus.acronym}" already exists.`);
+        }
+
+        // Validate field constraints
+        if (newStatus.label.length < 1 || newStatus.label.length > 30) {
+            throw new Error("Status label must be 1-30 characters.");
+        }
+        if (newStatus.acronym.length < 1 || newStatus.acronym.length > 3) {
+            throw new Error("Status acronym must be 1-3 characters.");
+        }
+        if (!/^#[0-9A-Fa-f]{6}$/.test(newStatus.color)) {
+            throw new Error("Status color must be a valid hex color (#RRGGBB).");
+        }
+        if (newStatus.multiplier < 0 || newStatus.multiplier > 1) {
+            throw new Error("Status multiplier must be between 0 and 1.");
+        }
+        if (newStatus.absenceWeight < 0 || newStatus.absenceWeight > 1) {
+            throw new Error("Status absenceWeight must be between 0 and 1.");
+        }
+
+        // Calculate next order
+        const maxOrder = Math.max(...Object.values(existingStatuses).map((s) => s.order), -1);
+        const nextOrder = maxOrder + 1;
+
+        // Generate ID using Firebase's doc() without arguments (creates unique ID)
+        const statusId = doc(Collections.classes()).id;
+        const status: StatusDefinition = {
+            ...newStatus,
+            id: statusId,
+            order: nextOrder,
+            isArchived: false,
+        };
+
+        // Update class document
+        const docRef = doc(Collections.classes(), classId);
+        await updateDoc(docRef, {
+            [`statusDefinitions.${statusId}`]: status,
+            updatedAt: serverTimestamp(),
+        });
+
+        return statusId;
+    },
+
+    /**
+     * Update an existing status definition.
+     * Validates uniqueness if label or acronym is being changed.
+     *
+     * @throws Error if new label/acronym conflicts with existing (non-archived) status
+     * @throws Error if validation fails
+     *
+     * @example
+     * await classApi.updateStatus(classId, statusId, {
+     *   label: "Present (Remote)",
+     *   color: "#10b981"
+     * });
+     */
+    updateStatus: async (
+        classId: string,
+        statusId: string,
+        updates: Partial<Omit<StatusDefinition, "id">>,
+    ): Promise<void> => {
+        // Fetch current class to validate
+        const classDoc = await classApi.getClassById(classId);
+        const existingStatuses = classDoc.statusDefinitions || {};
+        const currentStatus = existingStatuses[statusId];
+
+        if (!currentStatus) {
+            throw new Error("Status not found.");
+        }
+
+        // Validate uniqueness if label or acronym is being changed
+        if (updates.label || updates.acronym) {
+            const activeStatuses = Object.values(existingStatuses).filter(
+                (s) => !s.isArchived && s.id !== statusId,
+            );
+
+            if (updates.label) {
+                const labelExists = activeStatuses.some(
+                    (s) => s.label.toLowerCase() === updates.label!.toLowerCase(),
+                );
+                if (labelExists) {
+                    throw new Error(`Status label "${updates.label}" already exists.`);
+                }
+                if (updates.label.length < 1 || updates.label.length > 30) {
+                    throw new Error("Status label must be 1-30 characters.");
+                }
+            }
+
+            if (updates.acronym) {
+                const acronymExists = activeStatuses.some(
+                    (s) => s.acronym.toLowerCase() === updates.acronym!.toLowerCase(),
+                );
+                if (acronymExists) {
+                    throw new Error(`Status acronym "${updates.acronym}" already exists.`);
+                }
+                if (updates.acronym.length < 1 || updates.acronym.length > 3) {
+                    throw new Error("Status acronym must be 1-3 characters.");
+                }
+            }
+        }
+
+        // Validate other field constraints
+        if (updates.color && !/^#[0-9A-Fa-f]{6}$/.test(updates.color)) {
+            throw new Error("Status color must be a valid hex color (#RRGGBB).");
+        }
+        if (
+            updates.multiplier !== undefined &&
+            (updates.multiplier < 0 || updates.multiplier > 1)
+        ) {
+            throw new Error("Status multiplier must be between 0 and 1.");
+        }
+        if (
+            updates.absenceWeight !== undefined &&
+            (updates.absenceWeight < 0 || updates.absenceWeight > 1)
+        ) {
+            throw new Error("Status absenceWeight must be between 0 and 1.");
+        }
+
+        // Merge updates with current status
+        const updatedStatus = { ...currentStatus, ...updates };
+
+        // Update class document
+        const docRef = doc(Collections.classes(), classId);
+        await updateDoc(docRef, {
+            [`statusDefinitions.${statusId}`]: updatedStatus,
+            updatedAt: serverTimestamp(),
+        });
+    },
+
+    /**
+     * Soft-delete a status definition by setting isArchived to true.
+     * Prevents deletion if it would leave zero active statuses.
+     *
+     * @throws Error if this is the last active status
+     *
+     * @example
+     * await classApi.deleteStatus(classId, statusId);
+     */
+    deleteStatus: async (classId: string, statusId: string): Promise<void> => {
+        // Fetch current class to validate
+        const classDoc = await classApi.getClassById(classId);
+        const existingStatuses = classDoc.statusDefinitions || {};
+        const currentStatus = existingStatuses[statusId];
+
+        if (!currentStatus) {
+            throw new Error("Status not found.");
+        }
+
+        // Count active (non-archived) statuses
+        const activeStatuses = Object.values(existingStatuses).filter((s) => !s.isArchived);
+
+        if (activeStatuses.length <= 1) {
+            throw new Error(
+                "Cannot delete the last active status. At least one status is required.",
+            );
+        }
+
+        // Soft-delete by setting isArchived
+        const updatedStatus = { ...currentStatus, isArchived: true };
+
+        // Update class document
+        const docRef = doc(Collections.classes(), classId);
+        await updateDoc(docRef, {
+            [`statusDefinitions.${statusId}`]: updatedStatus,
+            updatedAt: serverTimestamp(),
+        });
+    },
+
+    /**
+     * Save scoring rules for a class.
+     * Validates all field constraints before saving.
+     *
+     * @throws Error if validation fails
+     *
+     * @example
+     * await classApi.saveScoringRules(classId, {
+     *   basePoints: 100,
+     *   allowedAbsences: 3,
+     *   penaltyPerAbsence: 10,
+     *   capAtZero: true
+     * });
+     */
+    saveScoringRules: async (classId: string, rules: ScoringRules): Promise<void> => {
+        // Validate constraints
+        if (rules.basePoints < 1 || rules.basePoints > 1000) {
+            throw new Error("Base points must be between 1 and 1000.");
+        }
+        if (rules.allowedAbsences < 0 || rules.allowedAbsences > 50) {
+            throw new Error("Allowed absences must be between 0 and 50.");
+        }
+        if (rules.penaltyPerAbsence < 0 || rules.penaltyPerAbsence > 100) {
+            throw new Error("Penalty per absence must be between 0 and 100.");
+        }
+
+        // Update class document
+        const docRef = doc(Collections.classes(), classId);
+        await updateDoc(docRef, {
+            scoringRules: rules,
+            updatedAt: serverTimestamp(),
+        });
     },
 };

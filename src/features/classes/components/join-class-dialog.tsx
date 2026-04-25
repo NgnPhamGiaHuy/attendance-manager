@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heading, Text } from "@/components/ui/typography";
+import { Text } from "@/components/ui/typography";
 import { useJoinClass } from "@/features/classes/hooks/useClasses";
 
 export function JoinClassDialog() {
@@ -72,9 +72,7 @@ export function JoinClassDialog() {
             />
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>
-                        <Heading size="6">Join Class</Heading>
-                    </DialogTitle>
+                    <DialogTitle>Join Class</DialogTitle>
                     <DialogDescription>
                         <Text size="4" color="olive" className="leading-relaxed">
                             Enter the 6-character class code provided by your instructor to join.

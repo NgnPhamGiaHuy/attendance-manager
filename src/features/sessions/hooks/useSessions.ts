@@ -47,13 +47,22 @@ export function useSessionAttendance(sessionId: string) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!sessionId) return;
+        if (!sessionId) {
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
 
-        const unsubscribe = attendanceApi.subscribeBySessionId(sessionId, (data) => {
-            setRecords(data);
-            setIsLoading(false);
-        });
+        const unsubscribe = attendanceApi.subscribeBySessionId(
+            sessionId,
+            (data) => {
+                setRecords(data);
+                setIsLoading(false);
+            },
+            () => {
+                setIsLoading(false);
+            },
+        );
 
         return () => unsubscribe();
     }, [sessionId]);
@@ -82,13 +91,22 @@ export function useClassSessions(classId: string) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!classId) return;
+        if (!classId) {
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
 
-        const unsubscribe = sessionApi.subscribeByClassId(classId, (data) => {
-            setSessions(data);
-            setIsLoading(false);
-        });
+        const unsubscribe = sessionApi.subscribeByClassId(
+            classId,
+            (data) => {
+                setSessions(data);
+                setIsLoading(false);
+            },
+            () => {
+                setIsLoading(false);
+            },
+        );
 
         return () => unsubscribe();
     }, [classId]);
@@ -186,6 +204,57 @@ export function useUpdateSession() {
         onError: (error) => {
             console.error("[useUpdateSession] Mutation failed:", error);
             toast.error("Failed to update session details.");
+        },
+    });
+}
+
+// ─── Bulk mark attendance mutation ────────────────────────────────────────────
+
+export function useBulkMarkAttendance(sessionId: string) {
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (params: {
+            classId: string;
+            studentIds: Set<string>;
+            statusId: string;
+            statusDef: { label: string; multiplier: number; absenceWeight: number };
+            studentNames: Map<string, string>;
+        }) => {
+            if (!user) throw new Error("Must be logged in.");
+
+            const { bulkMarkAttendance } = await import("@/features/sessions/api/sessionApi");
+
+            return bulkMarkAttendance(
+                sessionId,
+                params.classId,
+                params.studentIds,
+                params.statusId,
+                params.statusDef,
+                user.uid,
+                params.studentNames,
+            );
+        },
+        onMutate: async (params) => {
+            // Cancel outgoing refetches
+            await queryClient.cancelQueries({ queryKey: ["attendance", sessionId] });
+
+            // Snapshot previous value
+            const previous = queryClient.getQueryData(["attendance", sessionId]);
+
+            // Optimistically update (if we had query-based attendance)
+            // For now, real-time subscription will handle the update
+
+            return { previous };
+        },
+        onError: (err, vars, context) => {
+            // Rollback on error (real-time will revert automatically)
+            toast.error("Failed to apply bulk changes. No records were modified.");
+            console.error("Bulk mark error:", err);
+        },
+        onSuccess: (_, params) => {
+            toast.success(`Marked ${params.studentIds.size} students as ${params.statusDef.label}`);
         },
     });
 }

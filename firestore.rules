@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // ─── Helper Functions ──────────────────────────────────────────────────
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -12,17 +12,21 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == ownerId;
     }
 
-    // Simplified checks for projects without custom claims
-    // We check the class document directly for ownership
-    function isClassOwner(classId) {
-      return isAuthenticated() && 
-             get(/databases/$(database)/documents/classes/$(classId)).data.ownerId == request.auth.uid;
+    // Get the caller's role in a class from the members subcollection
+    function getRole(classId) {
+      return get(/databases/$(database)/documents/classes/$(classId)/members/$(request.auth.uid)).data.role;
     }
 
-    // For checking if a user is a member (student or teacher)
-    function isMember(classId) {
-      return isAuthenticated() && 
-             (isClassOwner(classId) || exists(/databases/$(database)/documents/classes/$(classId)/members/$(request.auth.uid)));
+    function isTeacher(classId) {
+      return isAuthenticated() && getRole(classId) == "teacher";
+    }
+
+    function isTeacherOrTA(classId) {
+      return isAuthenticated() && getRole(classId) in ["teacher", "ta"];
+    }
+
+    function isClassMember(classId) {
+      return isAuthenticated() && exists(/databases/$(database)/documents/classes/$(classId)/members/$(request.auth.uid));
     }
 
     // ─── Users Collection ──────────────────────────────────────────────────
@@ -32,37 +36,56 @@ service cloud.firestore {
 
     // ─── Classes Collection ────────────────────────────────────────────────
     match /classes/{classId} {
-      allow read: if isAuthenticated();
-      allow update, delete: if isOwner(resource.data.ownerId);
+      allow read: if isClassMember(classId);
       allow create: if isAuthenticated();
+      // Teacher can update anything; TA cannot touch statusDefinitions, scoringRules, name, description, isArchived
+      allow update: if isTeacher(classId) ||
+        (isTeacherOrTA(classId) &&
+         !("statusDefinitions" in request.resource.data.diff(resource.data).affectedKeys()) &&
+         !("scoringRules" in request.resource.data.diff(resource.data).affectedKeys()) &&
+         !("name" in request.resource.data.diff(resource.data).affectedKeys()) &&
+         !("description" in request.resource.data.diff(resource.data).affectedKeys()) &&
+         !("isArchived" in request.resource.data.diff(resource.data).affectedKeys()));
+      allow delete: if isTeacher(classId);
 
       match /members/{userId} {
-        allow read: if isAuthenticated();
-        allow write: if isClassOwner(classId);
+        allow read: if isClassMember(classId);
+        allow write: if isTeacher(classId);
       }
     }
 
     // ─── Enrollments Collection ────────────────────────────────────────────
     match /enrollments/{enrollmentId} {
-      allow read: if isAuthenticated(); // Simplified for now
-      allow create, update: if isAuthenticated(); // Should be isClassOwner, but simplify to fix the bug
-      allow delete: if false; 
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      // Teacher/TA can update (deactivate); Cloud Functions use admin SDK (bypasses rules)
+      allow update: if isTeacherOrTA(resource.data.classId) ||
+        request.auth.token.firebase.sign_in_provider == "custom";
+      allow delete: if false; // No hard deletes
     }
 
     // ─── Sessions Collection ───────────────────────────────────────────────
     match /sessions/{sessionId} {
       allow read: if isAuthenticated();
-      // Only teachers can create/update sessions
-      allow create, update, delete: if isAuthenticated();
+      // Teacher or TA can create/update; teacher-only delete
+      allow create: if isAuthenticated() && isTeacherOrTA(request.resource.data.classId);
+      allow update: if isAuthenticated() && isTeacherOrTA(resource.data.classId);
+      allow delete: if isTeacher(resource.data.classId);
     }
 
     // ─── Attendance Records Collection ─────────────────────────────────────
     match /attendance_records/{recordId} {
       allow read: if isAuthenticated();
       
-      // Allow the class owner (teacher) to update any record
-      // Allow students to self-check-in if the session is active
-      allow create, update, delete: if isAuthenticated();
+      // Teacher/TA can write; students can self-check-in via QR
+      allow create: if isTeacherOrTA(request.resource.data.classId) ||
+        // QR self-check-in: student can only create their own record
+        (isClassMember(request.resource.data.classId) &&
+         request.resource.data.studentId == request.auth.uid &&
+         request.resource.data.source == "qr");
+      
+      allow update: if isTeacherOrTA(resource.data.classId);
+      allow delete: if false; // No hard deletes
     }
 
     // ─── Analytics Aggregates Collection ───────────────────────────────────

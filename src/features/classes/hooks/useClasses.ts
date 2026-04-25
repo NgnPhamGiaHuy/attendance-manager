@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
 import { classApi } from "@/features/classes/api/classApi";
@@ -26,9 +28,28 @@ export function useClasses() {
 }
 
 export function useClass(id: string) {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        return () => {
+            // Remove failed queries from cache on unmount so navigating back
+            // always triggers a fresh fetch instead of replaying the error.
+            const state = queryClient.getQueryState(classKeys.detail(id));
+            if (state?.status === "error") {
+                queryClient.removeQueries({ queryKey: classKeys.detail(id) });
+            }
+        };
+    }, [id, queryClient]);
+
     return useSuspenseQuery({
         queryKey: classKeys.detail(id),
         queryFn: () => classApi.getClassById(id),
+        // Don't retry on 404-style errors — the class simply doesn't exist
+        retry: (failureCount, error) => {
+            const msg = (error as Error)?.message?.toLowerCase() ?? "";
+            if (msg.includes("not found") || msg.includes("does not exist")) return false;
+            return failureCount < 1;
+        },
     });
 }
 

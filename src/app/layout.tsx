@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from "next/font/google";
 
+import { OfflineBanner } from "@/components/layout/offline-banner";
 import { Providers } from "@/providers/providers";
 
 import type { Metadata } from "next";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             suppressHydrationWarning
         >
             <body className="flex min-h-full flex-col antialiased">
+                <OfflineBanner />
                 <Providers>{children}</Providers>
             </body>
         </html>

@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { CheckCheck, Clock, Lock, Users } from "lucide-react";
+import { Timestamp } from "firebase/firestore";
+import { CheckCheck, History, Lock, QrCode, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,7 +28,11 @@ import { StatusChipRow } from "@/components/ui/status-chip";
 import { Heading, Text } from "@/components/ui/typography";
 import { useEnrollments } from "@/features/classes/hooks/useEnrollments";
 import { sessionApi } from "@/features/sessions/api/sessionApi";
+import { AuditLogPanel } from "@/features/sessions/components/audit-log-panel";
+import { BulkActionToolbar } from "@/features/sessions/components/bulk-action-toolbar";
+import { QRCodeModal } from "@/features/sessions/components/qr-code-modal";
 import {
+    useBulkMarkAttendance,
     useFinalizeSession,
     useMarkAttendance,
     useSession,
@@ -35,7 +41,7 @@ import {
 } from "@/features/sessions/hooks/useSessions";
 import { formatTime, getInitials } from "@/lib/utils";
 
-import type { Class, StatusDefinition } from "@/types";
+import type { AttendanceRecord, Class, StatusDefinition } from "@/types";
 
 // ─── Student Row ──────────────────────────────────────────────────────────────
 
@@ -43,44 +49,93 @@ interface StudentRowProps {
     studentId: string;
     studentName: string;
     currentStatusId: string | null;
+    currentRecord: AttendanceRecord | null;
     statuses: StatusDefinition[];
+    statusesMap: Record<string, StatusDefinition>;
     onMark: (statusId: string) => void;
     isDisabled: boolean;
+    isSelected: boolean;
+    onToggleSelect: () => void;
+    showCheckbox: boolean;
+    isAuditExpanded: boolean;
+    onToggleAudit: () => void;
+    showAuditToggle: boolean;
 }
 
 function StudentRow({
     studentId,
     studentName,
     currentStatusId,
+    currentRecord,
     statuses,
+    statusesMap,
     onMark,
     isDisabled,
+    isSelected,
+    onToggleSelect,
+    showCheckbox,
+    isAuditExpanded,
+    onToggleAudit,
+    showAuditToggle,
 }: StudentRowProps) {
+    const hasAuditTrail =
+        currentRecord && currentRecord.auditTrail && currentRecord.auditTrail.length > 0;
+
     return (
-        <div className="group border-border/60 bg-ivory hover:ring-terracotta/20 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border p-6 transition-all duration-300 hover:ring-1">
-            <div className="flex min-w-0 items-center gap-4">
-                <Avatar className="border-border/40 h-10 w-10 shrink-0 border">
-                    <AvatarFallback className="bg-background text-stone-gray text-[11px] font-bold tracking-wider uppercase">
-                        {getInitials(studentName)}
-                    </AvatarFallback>
-                </Avatar>
-                <Text size="5" weight="medium" className="truncate">
-                    {studentName}
-                </Text>
+        <div className="space-y-3">
+            <div className="group border-border/60 bg-ivory hover:ring-terracotta/20 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border p-6 transition-all duration-300 hover:ring-1">
+                <div className="flex min-w-0 items-center gap-4">
+                    {showCheckbox && (
+                        <Checkbox checked={isSelected} onCheckedChange={onToggleSelect} />
+                    )}
+                    <Avatar className="border-border/40 h-10 w-10 shrink-0 border">
+                        <AvatarFallback className="bg-background text-stone-gray text-[11px] font-bold tracking-wider uppercase">
+                            {getInitials(studentName)}
+                        </AvatarFallback>
+                    </Avatar>
+                    <Text size="5" weight="medium" className="truncate">
+                        {studentName}
+                    </Text>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <StatusChipRow
+                        statuses={statuses.map((s) => ({
+                            id: s.id,
+                            label: s.label,
+                            acronym: s.acronym,
+                            color: s.color,
+                        }))}
+                        activeStatusId={currentStatusId}
+                        onSelect={onMark}
+                        disabled={isDisabled}
+                        size="md"
+                    />
+
+                    {/* Audit Log Toggle Button */}
+                    {showAuditToggle && hasAuditTrail && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onToggleAudit}
+                            className="text-stone-gray hover:text-near-black"
+                            title="View change history"
+                        >
+                            <History className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
             </div>
 
-            <StatusChipRow
-                statuses={statuses.map((s) => ({
-                    id: s.id,
-                    label: s.label,
-                    acronym: s.acronym,
-                    color: s.color,
-                }))}
-                activeStatusId={currentStatusId}
-                onSelect={onMark}
-                disabled={isDisabled}
-                size="md"
-            />
+            {/* Audit Log Panel */}
+            {showAuditToggle && hasAuditTrail && currentRecord && (
+                <AuditLogPanel
+                    auditTrail={currentRecord.auditTrail}
+                    statuses={statusesMap}
+                    isExpanded={isAuditExpanded}
+                    onToggle={onToggleAudit}
+                />
+            )}
         </div>
     );
 }
@@ -172,16 +227,91 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
     const { recordMap, isLoading: recordsLoading } = useSessionAttendance(sessionId);
 
     const markAttendance = useMarkAttendance();
+    const bulkMarkAttendance = useBulkMarkAttendance(sessionId);
     const finalizeSession = useFinalizeSession();
     const updateSession = useUpdateSession();
+
     const [isMarkingAll, setIsMarkingAll] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+    const [expandedAuditRecordId, setExpandedAuditRecordId] = useState<string | null>(null);
+
+    // Filter to only active enrollments
+    const activeEnrollments = useMemo(() => enrollments.filter((e) => e.isActive), [enrollments]);
 
     const statuses = useMemo(
-        () => Object.values(classData.statusDefinitions).sort((a, b) => a.order - b.order),
+        () =>
+            Object.values(classData.statusDefinitions)
+                .filter((s) => !s.isArchived)
+                .sort((a, b) => a.order - b.order),
         [classData.statusDefinitions],
     );
 
+    const statusesMap = useMemo(() => classData.statusDefinitions, [classData.statusDefinitions]);
+
     const defaultStatus = statuses.find((s) => s.isDefault) ?? statuses[0];
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Escape to deselect all
+            if (e.key === "Escape" && selectedIds.size > 0) {
+                setSelectedIds(new Set());
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [selectedIds.size]);
+
+    const handleSelectAll = useCallback(() => {
+        setSelectedIds(new Set(activeEnrollments.map((e) => e.studentId)));
+    }, [activeEnrollments]);
+
+    const handleDeselectAll = useCallback(() => {
+        setSelectedIds(new Set());
+    }, []);
+
+    const handleToggleSelect = useCallback((studentId: string) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(studentId)) {
+                next.delete(studentId);
+            } else {
+                next.add(studentId);
+            }
+            return next;
+        });
+    }, []);
+
+    const handleBulkApply = useCallback(
+        async (statusId: string) => {
+            const status = statuses.find((s) => s.id === statusId);
+            if (!status) return;
+
+            // Build student names map
+            const studentNames = new Map<string, string>();
+            activeEnrollments.forEach((e) => {
+                studentNames.set(e.studentId, e.studentName);
+            });
+
+            await bulkMarkAttendance.mutateAsync({
+                classId: classData.id,
+                studentIds: selectedIds,
+                statusId,
+                statusDef: {
+                    label: status.label,
+                    multiplier: status.multiplier,
+                    absenceWeight: status.absenceWeight,
+                },
+                studentNames,
+            });
+
+            // Deselect after successful bulk operation
+            setSelectedIds(new Set());
+        },
+        [selectedIds, statuses, classData.id, activeEnrollments, bulkMarkAttendance],
+    );
 
     const handleMarkAll = useCallback(async () => {
         if (!defaultStatus) return;
@@ -334,17 +464,28 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
 
             {!isFinalized && (
                 <div className="flex flex-wrap items-center justify-between gap-6">
-                    <Button
-                        variant="secondary"
-                        onClick={handleMarkAll}
-                        disabled={isMarkingAll || enrollmentsLoading}
-                        className="bg-background border-border/60 gap-2.5 rounded-xl border px-8 font-semibold"
-                    >
-                        <CheckCheck className="h-4.5 w-4.5" />
-                        {isMarkingAll
-                            ? "Marking all…"
-                            : `Mark All ${defaultStatus?.label ?? "Present"}`}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Button
+                            variant="secondary"
+                            onClick={handleMarkAll}
+                            disabled={isMarkingAll || enrollmentsLoading}
+                            className="bg-background border-border/60 gap-2.5 rounded-xl border px-8 font-semibold"
+                        >
+                            <CheckCheck className="h-4.5 w-4.5" />
+                            {isMarkingAll
+                                ? "Marking all…"
+                                : `Mark All ${defaultStatus?.label ?? "Present"}`}
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsQRModalOpen(true)}
+                            className="gap-2.5 rounded-xl px-8 font-semibold"
+                        >
+                            <QrCode className="h-4.5 w-4.5" />
+                            QR Check-In
+                        </Button>
+                    </div>
 
                     <AlertDialog>
                         <AlertDialogTrigger
@@ -384,6 +525,17 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                 </div>
             )}
 
+            {/* Bulk Action Toolbar */}
+            {!isFinalized && selectedIds.size > 0 && (
+                <BulkActionToolbar
+                    selectedIds={selectedIds}
+                    statuses={statuses}
+                    onApply={handleBulkApply}
+                    onSelectAll={handleSelectAll}
+                    onDeselectAll={handleDeselectAll}
+                />
+            )}
+
             {enrollmentsLoading ? (
                 <div className="space-y-6">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -403,21 +555,51 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                 </div>
             ) : (
                 <div className="flex flex-col gap-6">
-                    {enrollments.map((enrollment) => (
-                        <StudentRow
-                            key={enrollment.studentId}
-                            studentId={enrollment.studentId}
-                            studentName={enrollment.studentName}
-                            currentStatusId={recordMap[enrollment.studentId]?.statusId ?? null}
-                            statuses={statuses}
-                            onMark={(statusId) =>
-                                handleMark(enrollment.studentId, enrollment.studentName, statusId)
-                            }
-                            isDisabled={isFinalized || markAttendance.isPending}
-                        />
-                    ))}
+                    {activeEnrollments.map((enrollment) => {
+                        const currentRecord = recordMap[enrollment.studentId] || null;
+                        return (
+                            <StudentRow
+                                key={enrollment.studentId}
+                                studentId={enrollment.studentId}
+                                studentName={enrollment.studentName}
+                                currentStatusId={currentRecord?.statusId ?? null}
+                                currentRecord={currentRecord}
+                                statuses={statuses}
+                                statusesMap={statusesMap}
+                                onMark={(statusId) =>
+                                    handleMark(
+                                        enrollment.studentId,
+                                        enrollment.studentName,
+                                        statusId,
+                                    )
+                                }
+                                isDisabled={isFinalized || markAttendance.isPending}
+                                isSelected={selectedIds.has(enrollment.studentId)}
+                                onToggleSelect={() => handleToggleSelect(enrollment.studentId)}
+                                showCheckbox={!isFinalized}
+                                isAuditExpanded={expandedAuditRecordId === enrollment.studentId}
+                                onToggleAudit={() =>
+                                    setExpandedAuditRecordId(
+                                        expandedAuditRecordId === enrollment.studentId
+                                            ? null
+                                            : enrollment.studentId,
+                                    )
+                                }
+                                showAuditToggle={true}
+                            />
+                        );
+                    })}
                 </div>
             )}
+
+            {/* QR Code Modal */}
+            <QRCodeModal
+                sessionId={sessionId}
+                qrSecret={session?.qrSecret ?? null}
+                qrExpiresAt={(session?.qrExpiresAt as Timestamp | null) ?? null}
+                isOpen={isQRModalOpen}
+                onClose={() => setIsQRModalOpen(false)}
+            />
         </div>
     );
 }

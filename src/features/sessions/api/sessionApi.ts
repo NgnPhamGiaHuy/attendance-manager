@@ -200,12 +200,56 @@ export const sessionApi = {
 
         await updateDoc(ref, updates);
     },
+
+    /**
+     * Activate QR check-in for a session.
+     * Generates a unique secret token and sets expiration to 5 minutes from now.
+     *
+     * @throws Error if session update fails
+     *
+     * @example
+     * await sessionApi.activateQR(sessionId);
+     */
+    activateQR: async (sessionId: string): Promise<void> => {
+        const ref = doc(Collections.sessions(), sessionId);
+        const qrSecret = doc(collection(db, "_temp")).id; // Generate unique ID
+        const qrExpiresAt = Timestamp.fromMillis(Date.now() + 300000); // 5 minutes = 300,000ms
+
+        await updateDoc(ref, {
+            qrSecret,
+            qrExpiresAt,
+        });
+    },
+
+    /**
+     * Refresh QR check-in for a session.
+     * Generates a NEW unique secret token (different from previous) and resets expiration.
+     *
+     * @throws Error if session update fails
+     *
+     * @example
+     * await sessionApi.refreshQR(sessionId);
+     */
+    refreshQR: async (sessionId: string): Promise<void> => {
+        const ref = doc(Collections.sessions(), sessionId);
+        const qrSecret = doc(collection(db, "_temp")).id; // Generate new unique ID
+        const qrExpiresAt = Timestamp.fromMillis(Date.now() + 300000); // 5 minutes = 300,000ms
+
+        await updateDoc(ref, {
+            qrSecret,
+            qrExpiresAt,
+        });
+    },
 };
 
 export const attendanceApi = {
     /**
      * Mark or update attendance for a student in a session.
      * Creates or overwrites the record, preserving the audit trail.
+     *
+     * @param params.reason - Optional reason for the change (required when isFinalized is true)
+     * @param params.isFinalized - Whether the session is finalized (requires reason if true)
+     * @throws Error if isFinalized is true but reason is missing or empty
      */
     mark: async (params: {
         sessionId: string;
@@ -219,6 +263,8 @@ export const attendanceApi = {
         markedBy: string;
         source: AttendanceSource;
         previousRecord?: AttendanceRecord;
+        reason?: string;
+        isFinalized?: boolean;
     }): Promise<void> => {
         const {
             sessionId,
@@ -232,7 +278,14 @@ export const attendanceApi = {
             markedBy,
             source,
             previousRecord,
+            reason,
+            isFinalized,
         } = params;
+
+        // Validate: if session is finalized, reason is required
+        if (isFinalized && (!reason || reason.trim() === "")) {
+            throw new Error("Reason is required when editing attendance in a finalized session.");
+        }
 
         // Build audit trail entry if this is a change
         const auditTrail: AuditEntry[] = previousRecord
@@ -243,6 +296,7 @@ export const attendanceApi = {
                       newStatusId: statusId,
                       changedBy: markedBy,
                       changedAt: Timestamp.now(),
+                      ...(reason ? { reason } : {}),
                   },
               ]
             : [];
@@ -308,3 +362,87 @@ export const attendanceApi = {
         );
     },
 };
+
+/**
+ * Build the check-in URL for QR code generation.
+ * Students scan this QR code to self-check-in to a session.
+ *
+ * @param sessionId - The session document ID
+ * @param qrSecret - The secret token from the session
+ * @returns Full check-in URL with query parameters
+ *
+ * @example
+ * const url = buildCheckinUrl(sessionId, session.qrSecret);
+ * // Returns: "/checkin?session=abc123&token=xyz789"
+ */
+export function buildCheckinUrl(sessionId: string, qrSecret: string): string {
+    return `/checkin?session=${sessionId}&token=${qrSecret}`;
+}
+
+/**
+ * Bulk mark attendance for multiple students with the same status.
+ * Chunks operations into batches of ≤500 for Firestore limits.
+ * Atomic: if any batch fails, the entire operation fails.
+ *
+ * @throws Error if any batch write fails
+ *
+ * @example
+ * await bulkMarkAttendance(
+ *   sessionId,
+ *   classId,
+ *   new Set(['student1', 'student2', 'student3']),
+ *   statusId,
+ *   statusDef,
+ *   teacherId
+ * );
+ */
+export async function bulkMarkAttendance(
+    sessionId: string,
+    classId: string,
+    studentIds: Set<string>,
+    statusId: string,
+    statusDef: { label: string; multiplier: number; absenceWeight: number },
+    markedBy: string,
+    studentNames: Map<string, string>, // studentId -> studentName
+): Promise<void> {
+    const studentArray = Array.from(studentIds);
+
+    // Chunk into batches of 500 (Firestore limit)
+    const chunks: string[][] = [];
+    for (let i = 0; i < studentArray.length; i += 500) {
+        chunks.push(studentArray.slice(i, i + 500));
+    }
+
+    // Process each chunk sequentially (atomic behavior)
+    for (const chunk of chunks) {
+        const batch = writeBatch(db);
+
+        for (const studentId of chunk) {
+            const recordId = `${sessionId}_${studentId}`;
+            const ref = doc(Collections.attendanceRecords(), recordId);
+            const studentName = studentNames.get(studentId) || "Unknown Student";
+
+            batch.set(
+                ref,
+                {
+                    sessionId,
+                    classId,
+                    studentId,
+                    studentName,
+                    statusId,
+                    statusLabel: statusDef.label,
+                    multiplierSnapshot: statusDef.multiplier,
+                    absenceWeightSnapshot: statusDef.absenceWeight,
+                    markedAt: serverTimestamp(),
+                    markedBy,
+                    source: "instructor" as const,
+                    auditTrail: [],
+                },
+                { merge: true },
+            );
+        }
+
+        // Commit batch - throws on failure
+        await batch.commit();
+    }
+}

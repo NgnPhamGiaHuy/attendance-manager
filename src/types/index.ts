@@ -26,6 +26,7 @@ export interface StatusDefinition {
     absenceWeight: number; // 1.0 = full absence, 0.5 = half, 0 = not counted
     isDefault: boolean; // true = applied when "Mark All" is pressed
     order: number; // display order
+    isArchived?: boolean; // soft-delete flag — preserves historical data integrity
 }
 
 export const DEFAULT_STATUSES: Omit<StatusDefinition, "id">[] = [
@@ -92,7 +93,6 @@ export interface Class {
     createdAt: FirestoreDate;
     updatedAt: FirestoreDate;
     isArchived: boolean;
-    // Default session times (HH:mm)
     defaultStartTime?: string;
     defaultEndTime?: string;
 }
@@ -118,7 +118,6 @@ export interface Enrollment {
     enrolledAt: FirestoreDate;
     isActive: boolean;
     deactivatedAt?: FirestoreDate;
-    // Aggregated fields — maintained by Cloud Functions
     aggregatedScore: number;
     totalAbsences: number;
     sessionsAttended: number;
@@ -143,7 +142,6 @@ export interface Session {
     closedAt: FirestoreDate | null;
     startAt: FirestoreDate | null;
     endAt: FirestoreDate | null;
-    // Summary — maintained by Cloud Functions
     attendanceSummary: Record<string, number>; // { [statusId]: count }
 }
 

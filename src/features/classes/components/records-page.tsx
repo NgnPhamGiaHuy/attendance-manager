@@ -170,6 +170,14 @@ export function RecordsPage({ classId }: { classId: string }) {
 
     const finalizedSessions = sessions.filter((s) => s.isFinalized);
 
+    // Separate active and inactive enrollments
+    const activeEnrollments = useMemo(() => enrollments.filter((e) => e.isActive), [enrollments]);
+
+    const inactiveEnrollments = useMemo(
+        () => enrollments.filter((e) => !e.isActive),
+        [enrollments],
+    );
+
     if (sessionsLoading || enrollmentsLoading) {
         return (
             <div className="space-y-6">
@@ -180,18 +188,45 @@ export function RecordsPage({ classId }: { classId: string }) {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <Heading size="2" color="stone" className="uppercase">
-                    {finalizedSessions.length} finalized sessions · {enrollments.length} students
-                </Heading>
+        <div className="space-y-8">
+            {/* Active Members Section */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <Heading size="2" color="stone" className="uppercase">
+                        {finalizedSessions.length} finalized sessions · {activeEnrollments.length}{" "}
+                        active students
+                    </Heading>
+                </div>
+                <RecordsMatrix
+                    classId={classId}
+                    sessions={finalizedSessions}
+                    enrollments={activeEnrollments}
+                    classData={classData}
+                />
             </div>
-            <RecordsMatrix
-                classId={classId}
-                sessions={finalizedSessions}
-                enrollments={enrollments}
-                classData={classData}
-            />
+
+            {/* Inactive Members Section */}
+            {inactiveEnrollments.length > 0 && (
+                <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-stone-gray/20 h-px flex-1" />
+                        <Heading size="3" color="stone" className="uppercase">
+                            Inactive Members ({inactiveEnrollments.length})
+                        </Heading>
+                        <div className="bg-stone-gray/20 h-px flex-1" />
+                    </div>
+                    <Text size="2" color="stone" className="text-center italic">
+                        These students have been deactivated but their historical records are
+                        preserved.
+                    </Text>
+                    <RecordsMatrix
+                        classId={classId}
+                        sessions={finalizedSessions}
+                        enrollments={inactiveEnrollments}
+                        classData={classData}
+                    />
+                </div>
+            )}
         </div>
     );
 }

@@ -11,13 +11,23 @@ export function useEnrollments(classId: string) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!classId) return;
+        if (!classId) {
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
 
-        const unsubscribe = enrollmentApi.subscribeByClassId(classId, (data) => {
-            setEnrollments(data);
-            setIsLoading(false);
-        });
+        const unsubscribe = enrollmentApi.subscribeByClassId(
+            classId,
+            (data) => {
+                setEnrollments(data);
+                setIsLoading(false);
+            },
+            () => {
+                // On error, stop loading so UI doesn't hang on skeleton
+                setIsLoading(false);
+            },
+        );
 
         return () => unsubscribe();
     }, [classId]);
