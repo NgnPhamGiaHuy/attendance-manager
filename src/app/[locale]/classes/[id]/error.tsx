@@ -39,7 +39,7 @@ export default function ClassError({
                     <Heading
                         size="9"
                         as="h1"
-                        className="text-near-black text-center font-serif tracking-tight"
+                        className="text-foreground text-center font-serif tracking-tight"
                     >
                         {isNotFound ? t("classNotFound") : t("somethingWentWrong")}
                     </Heading>

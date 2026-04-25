@@ -27,7 +27,7 @@ export default function NotFound() {
                     transition={{ delay: 0.1, duration: 1 }}
                     className="mb-8"
                 >
-                    <span className="text-terracotta/20 pointer-events-none block font-serif text-[12rem] leading-none font-bold tracking-tighter italic select-none sm:text-[16rem]">
+                    <span className="text-primary/20 pointer-events-none block font-serif text-[12rem] leading-none font-bold tracking-tighter italic select-none sm:text-[16rem]">
                         404
                     </span>
                 </motion.div>
@@ -36,7 +36,7 @@ export default function NotFound() {
                     <Heading
                         size="9"
                         as="h1"
-                        className="text-near-black text-center font-serif tracking-tight"
+                        className="text-foreground text-center font-serif tracking-tight"
                     >
                         {t("lostInThought")}
                     </Heading>

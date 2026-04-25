@@ -36,7 +36,7 @@ export function StatusChip({
             className={cn(
                 // Base styles
                 "inline-flex cursor-pointer items-center justify-center rounded-lg border font-medium transition-all duration-200",
-                "focus-visible:ring-2 focus-visible:ring-[#3898ec] focus-visible:ring-offset-1",
+                "focus-visible:ring-focus focus-visible:ring-2 focus-visible:ring-offset-1",
                 "disabled:cursor-not-allowed disabled:opacity-40",
                 // Size
                 size === "md" && "h-10 min-w-10 px-3 text-sm",
@@ -44,7 +44,7 @@ export function StatusChip({
                 // Active/inactive states
                 isActive
                     ? "ring-1 ring-offset-0"
-                    : "bg-background border-border/60 text-stone-gray hover:bg-secondary hover:text-near-black",
+                    : "bg-background border-border/60 text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
             style={
                 isActive

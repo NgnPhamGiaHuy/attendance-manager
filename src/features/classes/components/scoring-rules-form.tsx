@@ -143,7 +143,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                     </Button>
                 </div>
 
-                <div className="border-border/40 bg-ivory whisper-shadow grid grid-cols-2 gap-6 rounded-2xl border p-6 md:grid-cols-4">
+                <div className="border-border/40 bg-card whisper-shadow grid grid-cols-2 gap-6 rounded-2xl border p-6 md:grid-cols-4">
                     <div>
                         <Text size="1" weight="bold" color="stone" className="mb-2 uppercase">
                             {t("basePoints")}
@@ -184,7 +184,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                 </Text>
             </div>
 
-            <div className="border-border/40 bg-ivory whisper-shadow space-y-6 rounded-2xl border p-6">
+            <div className="border-border/40 bg-card whisper-shadow space-y-6 rounded-2xl border p-6">
                 {/* Form Fields */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -284,7 +284,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                             return (
                                 <div
                                     key={absences}
-                                    className="bg-ivory border-border/30 rounded-lg border p-3 text-center"
+                                    className="bg-card border-border/30 rounded-lg border p-3 text-center"
                                 >
                                     <Text size="1" color="olive" className="mb-1">
                                         {t("absence", { count: absences })}
@@ -292,7 +292,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                                     <Heading
                                         size="4"
                                         className={
-                                            score < 0 ? "text-destructive" : "text-near-black"
+                                            score < 0 ? "text-destructive" : "text-foreground"
                                         }
                                     >
                                         {score}

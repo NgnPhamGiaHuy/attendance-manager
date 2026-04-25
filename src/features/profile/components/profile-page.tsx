@@ -38,7 +38,7 @@ export function ProfilePage() {
                                     alt={user.displayName}
                                     className="object-cover"
                                 />
-                                <AvatarFallback className="bg-ivory text-near-black text-lg font-bold tracking-wider uppercase">
+                                <AvatarFallback className="bg-card text-foreground text-lg font-bold tracking-wider uppercase">
                                     {getInitials(user.displayName)}
                                 </AvatarFallback>
                             </Avatar>
@@ -56,7 +56,7 @@ export function ProfilePage() {
                             <div className="space-y-2">
                                 <Label
                                     htmlFor="fullName"
-                                    className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                    className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
                                     {t("fullName")}
                                 </Label>
@@ -70,7 +70,7 @@ export function ProfilePage() {
                             <div className="space-y-2">
                                 <Label
                                     htmlFor="email"
-                                    className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                    className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
                                     {t("emailAddress")}
                                 </Label>
@@ -104,18 +104,18 @@ export function ProfilePage() {
                     <CardContent className="space-y-10">
                         <div className="grid gap-10 sm:grid-cols-2">
                             <div className="space-y-2">
-                                <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
+                                <Label className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase">
                                     {t("role")}
                                 </Label>
-                                <div className="border-border/60 bg-ivory text-near-black flex h-12 w-full items-center rounded-xl border px-4 py-2 text-base capitalize">
+                                <div className="border-border/60 bg-card text-foreground flex h-12 w-full items-center rounded-xl border px-4 py-2 text-base capitalize">
                                     {user.role}
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
+                                <Label className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase">
                                     {t("accountId")}
                                 </Label>
-                                <div className="border-border/60 bg-ivory text-stone-gray flex h-12 w-full items-center rounded-xl border px-4 py-2 font-mono text-base text-sm">
+                                <div className="border-border/60 bg-card text-muted-foreground flex h-12 w-full items-center rounded-xl border px-4 py-2 font-mono text-base text-sm">
                                     {user.uid}
                                 </div>
                             </div>

@@ -30,7 +30,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
         <DialogPrimitive.Backdrop
             data-slot="dialog-overlay"
             className={cn(
-                "bg-near-black/20 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 backdrop-blur-[2px] transition-opacity duration-200",
+                "bg-foreground/20 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 backdrop-blur-[2px] transition-opacity duration-200",
                 className,
             )}
             {...props}
@@ -52,7 +52,7 @@ function DialogContent({
             <DialogPrimitive.Popup
                 data-slot="dialog-content"
                 className={cn(
-                    "bg-ivory text-near-black whisper-shadow ring-border/40 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-8 rounded-[32px] p-10 ring-1 duration-200 outline-none sm:max-w-lg",
+                    "bg-card text-foreground whisper-shadow ring-border/40 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-8 rounded-[32px] p-10 ring-1 duration-200 outline-none sm:max-w-lg",
                     className,
                 )}
                 {...props}
@@ -64,7 +64,7 @@ function DialogContent({
                         render={
                             <Button
                                 variant="ghost"
-                                className="hover:bg-background/80 text-stone-gray absolute top-6 right-6 h-10 w-10 rounded-xl"
+                                className="hover:bg-background/80 text-muted-foreground absolute top-6 right-6 h-10 w-10 rounded-xl"
                                 size="icon"
                             />
                         }

@@ -50,7 +50,7 @@ function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
                     <div className="flex flex-col gap-6">
                         <Link
                             href="/dashboard"
-                            className="text-stone-gray hover:text-near-black inline-flex w-fit items-center text-[10px] font-bold tracking-widest uppercase transition-colors"
+                            className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center text-[10px] font-bold tracking-widest uppercase transition-colors"
                         >
                             <ArrowLeft className="mr-2 h-3.5 w-3.5" />
                             {tCommon("backToDashboard")}
@@ -84,8 +84,8 @@ function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
                                         className={cn(
                                             "border-b-2 px-1 py-4 font-serif text-base whitespace-nowrap transition-all duration-200",
                                             isActive
-                                                ? "border-terracotta text-near-black font-medium"
-                                                : "text-stone-gray hover:text-olive-gray hover:border-border/60 border-transparent",
+                                                ? "border-primary text-foreground font-medium"
+                                                : "text-muted-foreground hover:text-muted-foreground hover:border-border/60 border-transparent",
                                         )}
                                         aria-current={isActive ? "page" : undefined}
                                     >
@@ -109,16 +109,16 @@ function ClassLayoutSkeleton() {
         <AppShell title={t("loadingClass")}>
             <PageContainer>
                 <div className="flex animate-pulse flex-col gap-10">
-                    <div className="bg-ivory ring-border/40 h-4 w-32 rounded ring-1" />
+                    <div className="bg-card ring-border/40 h-4 w-32 rounded ring-1" />
                     <div className="border-border/20 flex items-end justify-between border-b pb-10">
                         <div className="space-y-4">
-                            <div className="bg-ivory ring-border/40 h-14 w-96 rounded-2xl ring-1" />
-                            <div className="bg-ivory ring-border/40 h-6 w-64 rounded-xl ring-1" />
+                            <div className="bg-card ring-border/40 h-14 w-96 rounded-2xl ring-1" />
+                            <div className="bg-card ring-border/40 h-6 w-64 rounded-xl ring-1" />
                         </div>
-                        <div className="bg-ivory ring-border/40 h-12 w-44 rounded-2xl ring-1" />
+                        <div className="bg-card ring-border/40 h-12 w-44 rounded-2xl ring-1" />
                     </div>
-                    <div className="bg-ivory/50 ring-border/20 h-14 w-full rounded-2xl ring-1" />
-                    <div className="bg-ivory whisper-shadow mt-4 h-96 w-full rounded-[32px]" />
+                    <div className="bg-card/50 ring-border/20 h-14 w-full rounded-2xl ring-1" />
+                    <div className="bg-card whisper-shadow mt-4 h-96 w-full rounded-[32px]" />
                 </div>
             </PageContainer>
         </AppShell>

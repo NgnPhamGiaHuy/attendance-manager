@@ -53,7 +53,7 @@ function RecordsMatrix({
 
     if (sessions.length === 0) {
         return (
-            <div className="bg-ivory/50 border-border/40 whisper-shadow animate-fade-in flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
+            <div className="bg-card/50 border-border/40 whisper-shadow animate-fade-in flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
                 <Text size="4" color="stone" className="max-w-md leading-relaxed">
                     {t("noFinalizedSessions")}
                 </Text>
@@ -62,7 +62,7 @@ function RecordsMatrix({
     }
 
     return (
-        <div className="border-border/30 bg-ivory whisper-shadow animate-fade-in overflow-hidden rounded-[32px] border">
+        <div className="border-border/30 bg-card whisper-shadow animate-fade-in overflow-hidden rounded-[32px] border">
             <ScrollArea className="w-full">
                 <div className="w-max min-w-full">
                     <table className="w-full border-separate border-spacing-0">
@@ -110,11 +110,11 @@ function RecordsMatrix({
                                         key={enrollment.studentId}
                                         className="group hover:bg-background transition-colors"
                                     >
-                                        <td className="bg-ivory/95 border-border/20 group-hover:bg-background sticky left-0 z-10 max-w-[240px] truncate border-r px-8 py-5 backdrop-blur-sm">
+                                        <td className="bg-card/95 border-border/20 group-hover:bg-background sticky left-0 z-10 max-w-[240px] truncate border-r px-8 py-5 backdrop-blur-sm">
                                             <Text
                                                 size="3"
                                                 weight="medium"
-                                                className="text-near-black"
+                                                className="text-foreground"
                                             >
                                                 {enrollment.studentName}
                                             </Text>
@@ -142,7 +142,7 @@ function RecordsMatrix({
                                                         <Text
                                                             size="3"
                                                             weight="bold"
-                                                            className="text-stone-gray/20"
+                                                            className="text-muted-foreground/20"
                                                         >
                                                             —
                                                         </Text>
@@ -211,11 +211,11 @@ export function RecordsPage({ classId }: { classId: string }) {
             {inactiveEnrollments.length > 0 && (
                 <div className="space-y-6">
                     <div className="flex items-center gap-3">
-                        <div className="bg-stone-gray/20 h-px flex-1" />
+                        <div className="bg-muted/20 h-px flex-1" />
                         <Heading size="3" color="stone" className="uppercase">
                             {t("inactiveMembers", { count: inactiveEnrollments.length })}
                         </Heading>
-                        <div className="bg-stone-gray/20 h-px flex-1" />
+                        <div className="bg-muted/20 h-px flex-1" />
                     </div>
                     <Text size="2" color="stone" className="text-center italic">
                         {t("inactiveDesc")}

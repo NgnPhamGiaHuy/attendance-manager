@@ -15,6 +15,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Text } from "@/components/ui/typography";
 import { usePathname, useRouter } from "@/i18n/routing";
 
@@ -44,13 +45,13 @@ export function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-background ring-border/20 flex h-10 w-10 items-center justify-center rounded-xl ring-1">
-                                    <Languages className="text-stone-gray h-5 w-5" />
+                                    <Languages className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <Text
                                         size="3"
                                         weight="medium"
-                                        className="text-near-black block"
+                                        className="text-foreground block"
                                     >
                                         {locale === "vi" ? "Tiếng Việt" : "English"}
                                     </Text>
@@ -58,14 +59,14 @@ export function SettingsPage() {
                             </div>
 
                             <Select defaultValue={locale} onValueChange={handleLocaleChange}>
-                                <SelectTrigger className="bg-ivory ring-border/40 hover:ring-border/60 whisper-shadow h-11 w-[160px] rounded-xl border-none font-serif text-sm font-medium ring-1 transition-all">
+                                <SelectTrigger className="bg-card ring-border/40 hover:ring-border/60 whisper-shadow h-11 w-[160px] rounded-xl border-none font-serif text-sm font-medium ring-1 transition-all">
                                     <SelectValue
                                         placeholder={locale === "vi" ? "Tiếng Việt" : "English"}
                                     />
                                 </SelectTrigger>
                                 <SelectContent
                                     align="end"
-                                    className="bg-ivory border-border/20 rounded-xl shadow-xl"
+                                    className="bg-card border-border/20 rounded-xl shadow-xl"
                                 >
                                     <SelectItem
                                         value="vi"
@@ -99,7 +100,7 @@ export function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-background ring-border/20 flex h-10 w-10 items-center justify-center rounded-xl ring-1">
-                                    <Moon className="text-stone-gray h-5 w-5" />
+                                    <Moon className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <Text size="3" weight="medium" className="block">
@@ -110,7 +111,7 @@ export function SettingsPage() {
                                     </Text>
                                 </div>
                             </div>
-                            <Switch />
+                            <ThemeToggle />
                         </div>
                     </CardContent>
                 </Card>
@@ -125,7 +126,7 @@ export function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-background ring-border/20 flex h-10 w-10 items-center justify-center rounded-xl ring-1">
-                                    <Bell className="text-stone-gray h-5 w-5" />
+                                    <Bell className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <Text size="3" weight="medium" className="block">
@@ -142,7 +143,7 @@ export function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-background ring-border/20 flex h-10 w-10 items-center justify-center rounded-xl ring-1">
-                                    <Volume2 className="text-stone-gray h-5 w-5" />
+                                    <Volume2 className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <Text size="3" weight="medium" className="block">
@@ -168,7 +169,7 @@ export function SettingsPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="bg-background ring-border/20 flex h-10 w-10 items-center justify-center rounded-xl ring-1">
-                                    <Shield className="text-stone-gray h-5 w-5" />
+                                    <Shield className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <Text size="3" weight="medium" className="block">

@@ -121,7 +121,7 @@ export function QRCodeModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="border-border/40 bg-ivory whisper-shadow max-w-2xl rounded-[32px] p-10">
+            <DialogContent className="border-border/40 bg-card whisper-shadow max-w-2xl rounded-[32px] p-10">
                 <DialogHeader>
                     <DialogTitle className="font-serif text-2xl">{t("qrTitle")}</DialogTitle>
                     <DialogDescription className="leading-relaxed">{t("qrDesc")}</DialogDescription>
@@ -170,8 +170,8 @@ export function QRCodeModal({
                                         size="3"
                                         className={
                                             secondsRemaining < 60
-                                                ? "text-terracotta"
-                                                : "text-near-black"
+                                                ? "text-primary"
+                                                : "text-foreground"
                                         }
                                     >
                                         {countdownDisplay}
@@ -184,7 +184,10 @@ export function QRCodeModal({
                                 <Text size="2" weight="bold" color="stone" className="uppercase">
                                     {t("manualUrl")}
                                 </Text>
-                                <Text size="2" className="text-olive-gray font-mono break-all">
+                                <Text
+                                    size="2"
+                                    className="text-muted-foreground font-mono break-all"
+                                >
                                     {checkinUrl}
                                 </Text>
                             </div>

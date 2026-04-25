@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,20 +29,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-                <TooltipProvider>{children}</TooltipProvider>
-                <Toaster
-                    position="bottom-right"
-                    richColors
-                    closeButton
-                    toastOptions={{
-                        duration: 4000,
-                        classNames: {
-                            toast: "font-sans text-sm",
-                        },
-                    }}
-                />
-            </AuthProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                <AuthProvider>
+                    <TooltipProvider>{children}</TooltipProvider>
+                    <Toaster
+                        position="bottom-right"
+                        richColors
+                        closeButton
+                        toastOptions={{
+                            duration: 4000,
+                            classNames: {
+                                toast: "font-sans text-sm",
+                            },
+                        }}
+                    />
+                </AuthProvider>
+            </ThemeProvider>
             {process.env.NODE_ENV === "development" && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
     );

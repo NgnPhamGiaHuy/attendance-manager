@@ -9,10 +9,10 @@ import type { VariantProps } from "class-variance-authority";
 
 // ─── Heading ──────────────────────────────────────────────────────────────────
 
-const headingVariants = cva("font-serif text-near-black tracking-tight", {
+const headingVariants = cva("font-serif text-foreground tracking-tight", {
     variants: {
         size: {
-            "1": "text-sm font-bold uppercase tracking-widest text-stone-gray",
+            "1": "text-sm font-bold uppercase tracking-widest text-muted-foreground",
             "2": "text-base font-semibold",
             "3": "text-lg font-medium",
             "4": "text-xl font-medium",
@@ -72,7 +72,7 @@ Heading.displayName = "Heading";
 
 // ─── Text ─────────────────────────────────────────────────────────────────────
 
-const textVariants = cva("font-sans text-near-black", {
+const textVariants = cva("font-sans text-foreground", {
     variants: {
         size: {
             "1": "text-[11px] leading-4",
@@ -93,11 +93,13 @@ const textVariants = cva("font-sans text-near-black", {
             bold: "font-bold",
         },
         color: {
-            default: "text-near-black",
-            olive: "text-olive-gray",
-            stone: "text-stone-gray",
-            terracotta: "text-terracotta",
+            default: "text-foreground",
+            olive: "text-muted-foreground",
+            stone: "text-muted-foreground",
+            terracotta: "text-primary",
             white: "text-white",
+            muted: "text-muted-foreground",
+            destructive: "text-destructive",
         },
         align: {
             left: "text-left",

@@ -39,7 +39,7 @@ export function OfflineBanner() {
     if (!isOffline) return null;
 
     return (
-        <div className="animate-fade-in fixed top-0 right-0 left-0 z-50 flex items-center justify-center gap-3 bg-amber-500 px-4 py-3 text-white shadow-md">
+        <div className="animate-fade-in bg-warning fixed top-0 right-0 left-0 z-50 flex items-center justify-center gap-3 px-4 py-3 text-white shadow-md">
             <WifiOff className="h-5 w-5" />
             <Text size="3" weight="medium" className="text-white">
                 {t("offline")}

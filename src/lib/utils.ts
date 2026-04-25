@@ -102,9 +102,9 @@ export function formatScore(score: number): string {
  * Determine score color class based on value.
  */
 export function scoreColorClass(score: number): string {
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (score >= 80) return "text-success";
+    if (score >= 60) return "text-warning";
+    return "text-destructive";
 }
 
 /**

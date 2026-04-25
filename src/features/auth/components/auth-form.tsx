@@ -69,10 +69,10 @@ export function AuthForm() {
                     variant="secondary"
                     onClick={handleGoogleSignIn}
                     disabled={isGoogleLoading || isLoading}
-                    className="bg-ivory border-border/60 hover:bg-background ring-shadow w-full rounded-xl border"
+                    className="bg-card border-border/60 hover:bg-background ring-shadow w-full rounded-xl border"
                 >
                     {isGoogleLoading ? (
-                        <Loader2 className="text-stone-gray mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="text-muted-foreground mr-2 h-4 w-4 animate-spin" />
                     ) : null}
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                         <path
@@ -100,7 +100,7 @@ export function AuthForm() {
                         <span className="border-border/60 w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs">
-                        <span className="bg-background text-stone-gray px-4 text-[10px] font-medium tracking-widest uppercase">
+                        <span className="bg-background text-muted-foreground px-4 text-[10px] font-medium tracking-widest uppercase">
                             {t("orUseEmail")}
                         </span>
                     </div>
@@ -110,7 +110,7 @@ export function AuthForm() {
                     <div className="grid gap-2">
                         <Label
                             htmlFor="email"
-                            className="text-olive-gray ml-1 text-xs font-semibold tracking-wider uppercase"
+                            className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase"
                         >
                             {t("emailAddress")}
                         </Label>
@@ -121,14 +121,14 @@ export function AuthForm() {
                             placeholder="name@university.edu"
                             required
                             disabled={isLoading || isGoogleLoading}
-                            className="bg-ivory border-border/60 focus:bg-background h-12 rounded-xl transition-colors"
+                            className="bg-card border-border/60 focus:bg-background h-12 rounded-xl transition-colors"
                         />
                     </div>
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label
                                 htmlFor="password"
-                                className="text-olive-gray ml-1 text-xs font-semibold tracking-wider uppercase"
+                                className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase"
                             >
                                 {t("password")}
                             </Label>
@@ -139,7 +139,7 @@ export function AuthForm() {
                             type="password"
                             required
                             disabled={isLoading || isGoogleLoading}
-                            className="bg-ivory border-border/60 focus:bg-background h-12 rounded-xl transition-colors"
+                            className="bg-card border-border/60 focus:bg-background h-12 rounded-xl transition-colors"
                         />
                     </div>
                     <Button

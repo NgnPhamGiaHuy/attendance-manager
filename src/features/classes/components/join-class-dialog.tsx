@@ -64,7 +64,7 @@ export function JoinClassDialog() {
                 render={
                     <Button
                         variant="outline"
-                        className="whisper-shadow border-border/60 hover:bg-ivory h-11 rounded-xl px-6 text-sm font-medium"
+                        className="whisper-shadow border-border/60 hover:bg-card h-11 rounded-xl px-6 text-sm font-medium"
                     >
                         <Key className="mr-2.5 h-4 w-4" />
                         {t("join")}
@@ -85,7 +85,7 @@ export function JoinClassDialog() {
                     <div className="space-y-4">
                         <Label
                             htmlFor="code"
-                            className="text-stone-gray ml-1 text-xs font-bold tracking-widest uppercase"
+                            className="text-muted-foreground ml-1 text-xs font-bold tracking-widest uppercase"
                         >
                             {t("joinCode")}
                         </Label>
@@ -96,7 +96,7 @@ export function JoinClassDialog() {
                             onChange={(e) => setCode(e.target.value)}
                             disabled={joinClass.isPending}
                             autoFocus
-                            className="bg-background border-border/40 focus:border-terracotta focus:ring-terracotta/10 h-16 px-4 text-center font-serif text-3xl font-medium tracking-[0.2em] uppercase"
+                            className="bg-background border-border/40 focus:border-primary focus:ring-primary/10 h-16 px-4 text-center font-serif text-3xl font-medium tracking-[0.2em] uppercase"
                             maxLength={7}
                         />
                     </div>
@@ -107,7 +107,7 @@ export function JoinClassDialog() {
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    className="text-stone-gray rounded-xl px-6 font-serif"
+                                    className="text-muted-foreground rounded-xl px-6 font-serif"
                                 >
                                     {tCommon("cancel")}
                                 </Button>

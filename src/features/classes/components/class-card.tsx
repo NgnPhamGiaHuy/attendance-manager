@@ -122,14 +122,14 @@ export function ClassCard({ classItem, isArchived = false }: ClassCardProps) {
 
     return (
         <>
-            <Card className="hover:ring-terracotta/20 bg-ivory border-border/30 whisper-shadow group relative flex flex-col overflow-hidden rounded-[32px] transition-all duration-300 hover:ring-2">
+            <Card className="hover:ring-primary/20 bg-card border-border/30 whisper-shadow group relative flex flex-col overflow-hidden rounded-[32px] transition-all duration-300 hover:ring-2">
                 <CardHeader className="p-8 pb-2">
                     <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1 space-y-2">
                             <Heading size="5" asChild>
                                 <Link
                                     href={`/classes/${classItem.id}`}
-                                    className="text-near-black hover:text-terracotta block truncate transition-colors"
+                                    className="text-foreground hover:text-primary block truncate transition-colors"
                                 >
                                     {classItem.name}
                                 </Link>
@@ -156,7 +156,7 @@ export function ClassCard({ classItem, isArchived = false }: ClassCardProps) {
                                             onClick={(e) => e.stopPropagation()}
                                             className="-mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
                                         >
-                                            <MoreVertical className="text-stone-gray h-4.5 w-4.5" />
+                                            <MoreVertical className="text-muted-foreground h-4.5 w-4.5" />
                                             <span className="sr-only">{t("menu")}</span>
                                         </Button>
                                     }
@@ -220,7 +220,7 @@ export function ClassCard({ classItem, isArchived = false }: ClassCardProps) {
                             className="flex items-center gap-2"
                             title={t("members", { count: classItem.memberCount })}
                         >
-                            <Users className="text-stone-gray h-4 w-4" />
+                            <Users className="text-muted-foreground h-4 w-4" />
                             <Text
                                 size="1"
                                 weight="bold"
@@ -234,7 +234,7 @@ export function ClassCard({ classItem, isArchived = false }: ClassCardProps) {
                             className="flex items-center gap-2"
                             title={t("sessions", { count: classItem.sessionCount })}
                         >
-                            <Calendar className="text-stone-gray h-4 w-4" />
+                            <Calendar className="text-muted-foreground h-4 w-4" />
                             <Text
                                 size="1"
                                 weight="bold"

@@ -140,7 +140,7 @@ function StatusRow({
 
     if (isEditing) {
         return (
-            <div className="border-border/40 bg-ivory whisper-shadow space-y-4 rounded-2xl border p-6">
+            <div className="border-border/40 bg-card whisper-shadow space-y-4 rounded-2xl border p-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <Label htmlFor={`label-${status.id}`}>{t("label")}</Label>
@@ -253,7 +253,7 @@ function StatusRow({
     }
 
     return (
-        <div className="group border-border/30 bg-ivory hover:ring-border/60 whisper-shadow flex items-center justify-between gap-4 rounded-2xl border px-6 py-4 transition-all hover:ring-1">
+        <div className="group border-border/30 bg-card hover:ring-border/60 whisper-shadow flex items-center justify-between gap-4 rounded-2xl border px-6 py-4 transition-all hover:ring-1">
             <div className="flex items-center gap-4">
                 <Badge
                     style={{ backgroundColor: status.color }}
@@ -277,7 +277,7 @@ function StatusRow({
                     variant="ghost"
                     size="icon"
                     onClick={handleEdit}
-                    className="text-stone-gray hover:text-near-black h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100"
+                    className="text-muted-foreground hover:text-foreground h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100"
                 >
                     <Pencil className="h-4 w-4" />
                     <span className="sr-only">{t("editStatus")}</span>
@@ -288,7 +288,7 @@ function StatusRow({
                     onClick={() => setIsDeleting(true)}
                     disabled={isLastActive}
                     title={isLastActive ? t("cannotDeleteLast") : t("deleteStatus")}
-                    className="text-stone-gray hover:text-destructive hover:bg-destructive/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-50"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-50"
                 >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">{t("deleteStatus")}</span>
@@ -296,7 +296,7 @@ function StatusRow({
             </div>
 
             <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
-                <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-[32px] p-8">
+                <AlertDialogContent className="border-border/40 bg-card whisper-shadow rounded-[32px] p-8">
                     <AlertDialogHeader>
                         <AlertDialogTitle>
                             {t("archiveStatusTitle", { label: status.label })}
@@ -403,7 +403,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
     }
 
     return (
-        <div className="border-border/40 bg-ivory whisper-shadow space-y-4 rounded-2xl border p-6">
+        <div className="border-border/40 bg-card whisper-shadow space-y-4 rounded-2xl border p-6">
             <Heading size="4">{t("addNewStatus")}</Heading>
 
             <div className="grid grid-cols-2 gap-4">

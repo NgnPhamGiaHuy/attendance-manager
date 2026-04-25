@@ -20,9 +20,9 @@ function CheckinPageContent() {
     if (!sessionId || !token) {
         return (
             <div className="bg-background flex min-h-screen items-center justify-center p-6">
-                <div className="bg-ivory whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
+                <div className="bg-card whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
                     <h1 className="font-serif text-2xl font-bold">{t("invalidLink")}</h1>
-                    <p className="text-olive-gray">{t("invalidLinkDesc")}</p>
+                    <p className="text-muted-foreground">{t("invalidLinkDesc")}</p>
                 </div>
             </div>
         );
@@ -38,7 +38,7 @@ export default function CheckinRoute() {
         <Suspense
             fallback={
                 <div className="bg-background flex min-h-screen items-center justify-center">
-                    <Loader2 className="text-terracotta h-16 w-16 animate-spin" />
+                    <Loader2 className="text-primary h-16 w-16 animate-spin" />
                 </div>
             }
         >

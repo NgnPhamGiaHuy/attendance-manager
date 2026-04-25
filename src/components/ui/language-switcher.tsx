@@ -40,7 +40,7 @@ export function LanguageSwitcher({ className, variant = "ghost" }: LanguageSwitc
                         className={cn("h-9 w-9 rounded-xl", className)}
                         aria-label={t("language")}
                     >
-                        <Languages className="text-stone-gray h-5 w-5" />
+                        <Languages className="text-muted-foreground h-5 w-5" />
                     </Button>
                 )}
             />
@@ -48,7 +48,7 @@ export function LanguageSwitcher({ className, variant = "ghost" }: LanguageSwitc
                 <DropdownMenuItem
                     className={cn(
                         "flex cursor-pointer items-center gap-2 rounded-lg",
-                        locale === "vi" && "bg-ivory font-medium",
+                        locale === "vi" && "bg-card font-medium",
                     )}
                     onClick={() => handleLocaleChange("vi")}
                 >
@@ -58,7 +58,7 @@ export function LanguageSwitcher({ className, variant = "ghost" }: LanguageSwitc
                 <DropdownMenuItem
                     className={cn(
                         "flex cursor-pointer items-center gap-2 rounded-lg",
-                        locale === "en" && "bg-ivory font-medium",
+                        locale === "en" && "bg-card font-medium",
                     )}
                     onClick={() => handleLocaleChange("en")}
                 >
@@ -68,7 +68,7 @@ export function LanguageSwitcher({ className, variant = "ghost" }: LanguageSwitc
                 <DropdownMenuItem
                     className={cn(
                         "flex cursor-pointer items-center gap-2 rounded-lg",
-                        locale === "ja" && "bg-ivory font-medium",
+                        locale === "ja" && "bg-card font-medium",
                     )}
                     onClick={() => handleLocaleChange("ja")}
                 >

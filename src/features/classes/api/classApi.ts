@@ -185,11 +185,14 @@ export const classApi = {
         );
 
         const newClass = {
+            id: classRef.id,
             name: data.name,
             description: data.description || "",
             ownerId,
             ownerName,
             code: generateClassCode(),
+            defaultStartTime: "09:00",
+            defaultEndTime: "10:30",
             statusDefinitions,
             scoringRules: {
                 basePoints: 100,

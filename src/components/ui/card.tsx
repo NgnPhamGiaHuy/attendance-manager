@@ -13,7 +13,7 @@ function Card({
             data-slot="card"
             data-size={size}
             className={cn(
-                "group/card bg-card text-near-black ring-border/60 whisper-shadow flex flex-col overflow-hidden rounded-2xl ring-1",
+                "group/card bg-card text-foreground ring-border/60 whisper-shadow flex flex-col overflow-hidden rounded-2xl ring-1",
                 className,
             )}
             {...props}

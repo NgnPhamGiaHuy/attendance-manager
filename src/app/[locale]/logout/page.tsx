@@ -32,11 +32,11 @@ export default function LogoutPage() {
     }, [signOutUser, router]);
 
     return (
-        <div className="bg-background text-near-black flex min-h-screen flex-col items-center justify-center">
+        <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center">
             <div className="animate-fade-in flex flex-col items-center gap-8">
-                <div className="bg-ivory ring-border/40 whisper-shadow flex h-20 w-20 items-center justify-center rounded-3xl ring-1">
+                <div className="bg-card ring-border/40 whisper-shadow flex h-20 w-20 items-center justify-center rounded-3xl ring-1">
                     <span className="sr-only">{t("signingOut")}</span>
-                    <Loader2 className="text-terracotta h-10 w-10 animate-spin" />
+                    <Loader2 className="text-primary h-10 w-10 animate-spin" />
                 </div>
                 <div className="space-y-3 text-center">
                     <Heading size="6" as="h1">

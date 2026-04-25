@@ -85,8 +85,8 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
     if (state === "loading") {
         return (
             <div className="bg-background flex min-h-screen items-center justify-center p-6">
-                <div className="bg-ivory whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
-                    <Loader2 className="text-terracotta mx-auto h-16 w-16 animate-spin" />
+                <div className="bg-card whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
+                    <Loader2 className="text-primary mx-auto h-16 w-16 animate-spin" />
                     <Heading size="3" className="font-serif">
                         {t("checkingIn")}
                     </Heading>
@@ -102,9 +102,9 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
     if (state === "success") {
         return (
             <div className="bg-background flex min-h-screen items-center justify-center p-6">
-                <div className="bg-ivory whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
-                        <CheckCircle className="h-12 w-12 text-green-600" />
+                <div className="bg-card whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
+                    <div className="bg-success-bg mx-auto flex h-20 w-20 items-center justify-center rounded-full">
+                        <CheckCircle className="text-success h-12 w-12" />
                     </div>
                     <Heading size="2" className="font-serif">
                         {t("success")}
@@ -129,9 +129,9 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-6">
-            <div className="bg-ivory whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
-                    <XCircle className="h-12 w-12 text-red-600" />
+            <div className="bg-card whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
+                <div className="bg-destructive-bg mx-auto flex h-20 w-20 items-center justify-center rounded-full">
+                    <XCircle className="text-destructive h-12 w-12" />
                 </div>
                 <Heading size="2" className="font-serif">
                     {t(errorKeys.title)}

@@ -62,10 +62,10 @@ export function BulkActionToolbar({
     const isApplyDisabled = selectedIds.size === 0 || !selectedStatusId || isApplying;
 
     return (
-        <div className="bg-terracotta/5 border-terracotta/20 animate-fade-in flex flex-wrap items-center gap-4 rounded-2xl border p-4">
+        <div className="bg-primary/5 border-primary/20 animate-fade-in flex flex-wrap items-center gap-4 rounded-2xl border p-4">
             {/* Selected Count */}
             <div className="flex items-center gap-2">
-                <CheckSquare className="text-terracotta h-5 w-5" />
+                <CheckSquare className="text-primary h-5 w-5" />
                 <Text size="3" weight="semibold">
                     {t("bulkSelected", { count: selectedIds.size })}
                 </Text>
@@ -98,7 +98,7 @@ export function BulkActionToolbar({
             <Button
                 onClick={handleApply}
                 disabled={isApplyDisabled}
-                className="bg-terracotta hover:bg-terracotta/90"
+                className="bg-primary hover:bg-primary/90"
             >
                 {isApplying ? t("applying") : t("apply")}
             </Button>

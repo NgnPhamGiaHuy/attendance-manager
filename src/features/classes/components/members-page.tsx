@@ -170,10 +170,10 @@ function MemberRow({
     }, [classId, member.userId, enrollment, displayName]);
 
     return (
-        <div className="group border-border/30 bg-ivory hover:ring-border/60 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1">
+        <div className="group border-border/30 bg-card hover:ring-border/60 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1">
             <div className="flex min-w-0 items-center gap-4">
                 <Avatar className="ring-border/40 h-12 w-12 shrink-0 rounded-2xl ring-1">
-                    <AvatarFallback className="bg-background text-near-black font-serif text-sm font-semibold">
+                    <AvatarFallback className="bg-background text-foreground font-serif text-sm font-semibold">
                         {getInitials(displayName)}
                     </AvatarFallback>
                 </Avatar>
@@ -219,7 +219,7 @@ function MemberRow({
                         >
                             {t("score")}
                         </Text>
-                        <Heading size="4" className="text-near-black">
+                        <Heading size="4" className="text-foreground">
                             {enrollment.aggregatedScore ?? 0}
                         </Heading>
                     </div>
@@ -240,10 +240,10 @@ function MemberRow({
                             size="4"
                             className={
                                 attendanceRate >= 80
-                                    ? "text-near-black"
+                                    ? "text-foreground"
                                     : attendanceRate >= 60
-                                      ? "text-terracotta"
-                                      : "text-red-800"
+                                      ? "text-primary"
+                                      : "text-destructive"
                             }
                         >
                             {attendanceRate}%
@@ -265,14 +265,14 @@ function MemberRow({
                                             ? t("cannotRemoveLastTeacher")
                                             : t("remove")
                                     }
-                                    className="text-stone-gray hover:text-destructive hover:bg-destructive/5 h-10 w-10 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-30"
+                                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 h-10 w-10 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-30"
                                 >
                                     <UserX className="h-5 w-5" />
                                     <span className="sr-only">{t("remove")}</span>
                                 </Button>
                             }
                         />
-                        <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-[32px] p-8">
+                        <AlertDialogContent className="border-border/40 bg-card whisper-shadow rounded-[32px] p-8">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
                                     {t("removeConfirmTitle", { name: displayName })}
@@ -352,7 +352,7 @@ export function MembersPage({ classId }: { classId: string }) {
 
     if (members.length === 0) {
         return (
-            <div className="bg-ivory/50 border-border/40 flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-8 text-center">
+            <div className="bg-card/50 border-border/40 flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-8 text-center">
                 <Text size="4" color="stone" className="max-w-xs">
                     {t("noMembers")}
                 </Text>

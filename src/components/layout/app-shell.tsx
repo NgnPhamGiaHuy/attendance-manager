@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Heading, Text } from "@/components/ui/typography";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { cn, getInitials } from "@/lib/utils";
@@ -44,7 +45,7 @@ export function TopBar({ title }: TopBarProps) {
                         <Heading
                             size="3"
                             as="h1"
-                            className="text-olive-gray max-w-[200px] truncate sm:max-w-xs"
+                            className="text-muted-foreground max-w-[200px] truncate sm:max-w-xs"
                         >
                             {title}
                         </Heading>
@@ -53,6 +54,7 @@ export function TopBar({ title }: TopBarProps) {
             </div>
 
             <div className="flex items-center gap-2">
+                <ThemeToggle />
                 <LanguageSwitcher />
                 <div className="bg-border/40 mx-1 h-6 w-px" />
                 {user && (
@@ -64,7 +66,7 @@ export function TopBar({ title }: TopBarProps) {
                                     variant="ghost"
                                     size="icon"
                                     className={cn(
-                                        "focus-visible:ring-terracotta/20 relative h-9 w-9 cursor-pointer rounded-full outline-none focus-visible:ring-2",
+                                        "focus-visible:ring-primary/20 relative h-9 w-9 cursor-pointer rounded-full outline-none focus-visible:ring-2",
                                         triggerProps.className,
                                     )}
                                     aria-label={tAuth("account")}
@@ -74,7 +76,7 @@ export function TopBar({ title }: TopBarProps) {
                                             src={user.photoURL ?? undefined}
                                             alt={user.displayName}
                                         />
-                                        <AvatarFallback className="bg-ivory text-near-black text-[10px] font-bold tracking-wider uppercase">
+                                        <AvatarFallback className="bg-card text-foreground text-[10px] font-bold tracking-wider uppercase">
                                             {getInitials(user.displayName)}
                                         </AvatarFallback>
                                     </Avatar>
@@ -157,7 +159,7 @@ interface AppShellProps {
 
 export function AppShell({ children, title, className }: AppShellProps) {
     return (
-        <div className="bg-background text-near-black selection:bg-terracotta/20 flex min-h-screen flex-col">
+        <div className="bg-background text-foreground selection:bg-primary/20 flex min-h-screen flex-col">
             <TopBar title={title} />
             <main className={cn("flex flex-1 flex-col", className)}>{children}</main>
         </div>
@@ -225,13 +227,13 @@ export function AppShellSkeleton() {
         <div className="bg-background flex min-h-screen flex-col">
             <div className="border-border/40 bg-background/80 sticky top-0 z-10 h-16 border-b backdrop-blur-sm" />
             <div className="mx-auto w-full max-w-6xl px-8 py-12">
-                <div className="bg-ivory ring-border/20 h-14 w-64 animate-pulse rounded-2xl ring-1" />
-                <div className="bg-ivory/50 ring-border/20 mt-4 h-6 w-96 animate-pulse rounded-xl ring-1" />
+                <div className="bg-card ring-border/20 h-14 w-64 animate-pulse rounded-2xl ring-1" />
+                <div className="bg-card/50 ring-border/20 mt-4 h-6 w-96 animate-pulse rounded-xl ring-1" />
                 <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <div
                             key={i}
-                            className="bg-ivory ring-border/20 h-64 animate-pulse rounded-3xl ring-1"
+                            className="bg-card ring-border/20 h-64 animate-pulse rounded-3xl ring-1"
                         />
                     ))}
                 </div>

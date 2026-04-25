@@ -23,9 +23,9 @@ function DashboardContent({ showArchived }: { showArchived: boolean }) {
     if (!displayClasses || displayClasses.length === 0) {
         if (showArchived) {
             return (
-                <div className="border-border/30 bg-ivory animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
+                <div className="border-border/30 bg-card animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
                     <div className="bg-background ring-border/20 mb-8 flex h-24 w-24 items-center justify-center rounded-3xl ring-1">
-                        <Archive className="text-stone-gray h-10 w-10 opacity-30" />
+                        <Archive className="text-muted-foreground h-10 w-10 opacity-30" />
                     </div>
                     <Heading size="6" as="h3" className="mb-3">
                         {t("noArchivedClasses")}
@@ -38,9 +38,9 @@ function DashboardContent({ showArchived }: { showArchived: boolean }) {
         }
 
         return (
-            <div className="border-border/30 bg-ivory animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
+            <div className="border-border/30 bg-card animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
                 <div className="bg-background ring-border/20 mb-8 flex h-24 w-24 items-center justify-center rounded-3xl ring-1">
-                    <span className="text-stone-gray font-serif text-4xl font-bold opacity-30">
+                    <span className="text-muted-foreground font-serif text-4xl font-bold opacity-30">
                         A
                     </span>
                 </div>
@@ -73,7 +73,7 @@ function DashboardSkeleton() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                     key={i}
-                    className="border-border/30 bg-ivory whisper-shadow h-64 animate-pulse rounded-3xl border"
+                    className="border-border/30 bg-card whisper-shadow h-64 animate-pulse rounded-3xl border"
                 />
             ))}
         </div>

@@ -25,9 +25,9 @@ export function LandingPage() {
     }, [isLoading, isAuthenticated, router]);
 
     return (
-        <div className="bg-background text-near-black relative flex min-h-screen flex-col items-center overflow-x-hidden">
+        <div className="bg-background text-foreground relative flex min-h-screen flex-col items-center overflow-x-hidden">
             {/* Soft Editorial Accents */}
-            <div className="bg-terracotta absolute top-0 right-0 left-0 h-1.5" />
+            <div className="bg-primary absolute top-0 right-0 left-0 h-1.5" />
 
             {/* Navigation */}
             <SiteHeader />
@@ -36,7 +36,7 @@ export function LandingPage() {
             <header className="z-10 mt-44 flex flex-col items-center px-4 text-center sm:px-6 lg:px-20">
                 <Heading
                     size="1"
-                    className="border-terracotta/20 bg-terracotta/5 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 uppercase"
+                    className="border-primary/20 bg-primary/5 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 uppercase"
                 >
                     <Zap className="fill-terracotta h-3.5 w-3.5" />
                     {t("tagline")}
@@ -82,8 +82,8 @@ export function LandingPage() {
             {/* Core Philosophy / Features Section */}
             <section className="z-10 mt-32 grid w-full max-w-6xl grid-cols-1 gap-12 px-10 md:grid-cols-3">
                 <div className="flex flex-col gap-4">
-                    <div className="bg-ivory border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
-                        <CheckCircle2 className="text-terracotta h-6 w-6" />
+                    <div className="bg-card border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
+                        <CheckCircle2 className="text-primary h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
                         {t("f1Title")}
@@ -93,8 +93,8 @@ export function LandingPage() {
                     </Text>
                 </div>
                 <div className="flex flex-col gap-4">
-                    <div className="bg-ivory border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
-                        <Zap className="text-terracotta h-6 w-6" />
+                    <div className="bg-card border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
+                        <Zap className="text-primary h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
                         {t("f2Title")}
@@ -104,8 +104,8 @@ export function LandingPage() {
                     </Text>
                 </div>
                 <div className="flex flex-col gap-4">
-                    <div className="bg-ivory border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
-                        <QrCode className="text-terracotta h-6 w-6" />
+                    <div className="bg-card border-border/40 whisper-shadow flex h-12 w-12 items-center justify-center rounded-2xl border">
+                        <QrCode className="text-primary h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
                         {t("f3Title")}
@@ -118,9 +118,9 @@ export function LandingPage() {
 
             {/* Product Mockup */}
             <div className="z-10 mt-32 mb-20 flex w-full max-w-6xl justify-center px-6">
-                <div className="bg-ivory ring-border/40 whisper-shadow relative h-[500px] w-full overflow-hidden rounded-[40px] p-0 ring-1">
+                <div className="bg-card ring-border/40 whisper-shadow relative h-[500px] w-full overflow-hidden rounded-[40px] p-0 ring-1">
                     {/* Mockup UI header */}
-                    <div className="border-border/30 bg-ivory/50 flex items-center justify-between border-b px-10 py-8 backdrop-blur-sm">
+                    <div className="border-border/30 bg-card/50 flex items-center justify-between border-b px-10 py-8 backdrop-blur-sm">
                         <div className="flex flex-col gap-1">
                             <Text
                                 size="1"
@@ -138,7 +138,7 @@ export function LandingPage() {
                             </div>
                             <Button
                                 size="lg"
-                                className="bg-terracotta h-11 rounded-xl font-serif shadow-sm"
+                                className="bg-primary h-11 rounded-xl font-serif shadow-sm"
                             >
                                 {t("finishSession")}
                             </Button>
@@ -182,7 +182,7 @@ export function LandingPage() {
                                 className="flex items-center justify-between py-5"
                             >
                                 <div className="flex items-center gap-5">
-                                    <div className="bg-near-black/5 text-near-black flex h-12 w-12 items-center justify-center rounded-2xl font-serif text-sm font-medium">
+                                    <div className="bg-foreground/5 text-foreground flex h-12 w-12 items-center justify-center rounded-2xl font-serif text-sm font-medium">
                                         {student.initials}
                                     </div>
                                     <Text size="5" weight="medium">
@@ -230,7 +230,7 @@ export function LandingPage() {
                     </div>
 
                     {/* Soft fade out */}
-                    <div className="from-ivory absolute right-0 bottom-0 left-0 h-48 bg-gradient-to-t to-transparent"></div>
+                    <div className="from-card absolute right-0 bottom-0 left-0 h-48 bg-gradient-to-t to-transparent"></div>
                 </div>
             </div>
 

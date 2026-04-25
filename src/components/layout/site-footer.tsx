@@ -9,7 +9,7 @@ export function SiteFooter() {
     const t = useTranslations("footer");
 
     return (
-        <footer className="border-border/40 bg-ivory/50 border-t px-10 py-16 backdrop-blur-sm">
+        <footer className="border-border/40 bg-card/50 border-t px-10 py-16 backdrop-blur-sm">
             <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-8 md:flex-row">
                 <div className="flex flex-col gap-4">
                     <Logo />
@@ -23,13 +23,13 @@ export function SiteFooter() {
                             {t("product")}
                         </Text>
                         <ul className="flex flex-col gap-2">
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("features")}
                             </li>
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("security")}
                             </li>
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("pricing")}
                             </li>
                         </ul>
@@ -39,13 +39,13 @@ export function SiteFooter() {
                             {t("company")}
                         </Text>
                         <ul className="flex flex-col gap-2">
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("about")}
                             </li>
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("blog")}
                             </li>
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("careers")}
                             </li>
                         </ul>
@@ -55,10 +55,10 @@ export function SiteFooter() {
                             {t("legal")}
                         </Text>
                         <ul className="flex flex-col gap-2">
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("privacy")}
                             </li>
-                            <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
+                            <li className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors">
                                 {t("terms")}
                             </li>
                         </ul>

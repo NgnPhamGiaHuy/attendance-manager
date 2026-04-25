@@ -54,18 +54,18 @@ function SessionRow({
     const totalMarked = Object.values(session.attendanceSummary ?? {}).reduce((a, b) => a + b, 0);
 
     return (
-        <div className="group border-border/30 bg-ivory hover:ring-border/60 whisper-shadow animate-fade-in flex w-full items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1">
+        <div className="group border-border/30 bg-card hover:ring-border/60 whisper-shadow animate-fade-in flex w-full items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1">
             <button
                 onClick={() => router.push(`/classes/${classId}/sessions/${session.id}`)}
                 className="flex min-w-0 flex-1 items-center gap-4 text-left outline-none"
             >
                 <div className="bg-background ring-border/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1">
                     {session.isFinalized ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <CheckCircle2 className="text-success h-5 w-5" />
                     ) : session.isActive ? (
-                        <Clock className="animate-pulse-soft text-terracotta h-5 w-5" />
+                        <Clock className="animate-pulse-soft text-primary h-5 w-5" />
                     ) : (
-                        <Lock className="text-stone-gray h-5 w-5" />
+                        <Lock className="text-muted-foreground h-5 w-5" />
                     )}
                 </div>
                 <div className="min-w-0">
@@ -84,7 +84,7 @@ function SessionRow({
             </button>
             <div className="flex shrink-0 items-center gap-4">
                 {session.isActive && !session.isFinalized && (
-                    <Badge className="bg-terracotta/10 text-terracotta border-terracotta/20 rounded-lg px-2.5 py-0.5 font-serif text-[11px] font-bold tracking-widest uppercase">
+                    <Badge className="bg-primary/10 text-primary border-primary/20 rounded-lg px-2.5 py-0.5 font-serif text-[11px] font-bold tracking-widest uppercase">
                         {t("live")}
                     </Badge>
                 )}
@@ -104,7 +104,7 @@ function SessionRow({
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="text-stone-gray hover:text-destructive hover:bg-destructive/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100"
+                                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100"
                                     aria-label={t("deleteAction")}
                                 />
                             }
@@ -198,36 +198,37 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
             <div className="space-y-8 lg:col-span-2">
                 {/* Active session banner */}
                 {activeSession && (
-                    <div
-                        onClick={() =>
-                            router.push(`/classes/${classId}/sessions/${activeSession.id}`)
-                        }
-                        className="bg-terracotta/[0.03] border-terracotta/20 whisper-shadow animate-fade-in hover:ring-terracotta/40 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1"
-                    >
-                        <div className="flex items-center gap-4">
-                            <span className="relative flex h-3 w-3">
+                    <div className="border-border/40 bg-background/50 hover:ring-primary/20 whisper-shadow animate-fade-in flex items-center justify-between gap-6 rounded-3xl border p-8 transition-shadow hover:ring-1">
+                        <div className="flex items-center gap-5">
+                            <div className="relative flex h-3 w-3">
                                 <span className="bg-terracotta absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
                                 <span className="bg-terracotta relative inline-flex h-3 w-3 rounded-full" />
-                            </span>
-                            <div>
-                                <Heading size="3" className="text-terracotta">
+                            </div>
+                            <div className="space-y-1">
+                                <Heading size="3" className="font-serif">
                                     {t("activeSession", { title: activeSession.title })}
                                 </Heading>
                                 <Text
-                                    size="2"
+                                    size="1"
+                                    weight="bold"
                                     color="stone"
-                                    className="font-bold tracking-widest uppercase"
+                                    className="tracking-widest uppercase"
                                 >
                                     {t("attendanceOpen")}
                                 </Text>
                             </div>
                         </div>
                         <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-terracotta/20 text-terracotta hover:bg-terracotta/5 rounded-xl font-serif"
+                            asChild
+                            variant="secondary"
+                            className="border-border/60 hover:bg-background rounded-xl border px-6 font-semibold shadow-sm"
                         >
-                            {t("continue")} →
+                            <Link
+                                href={`/classes/${classId}/sessions/${activeSession.id}`}
+                                className="gap-2"
+                            >
+                                {t("continue")} →
+                            </Link>
                         </Button>
                     </div>
                 )}
@@ -239,7 +240,7 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
                             size="sm"
                             onClick={handleStartSession}
                             disabled={createSession.isPending || !!activeSession}
-                            className="bg-near-black rounded-xl font-serif text-sm shadow-sm"
+                            className="rounded-xl font-serif text-sm shadow-sm"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             {t("newSession")}
@@ -254,14 +255,14 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
                         ))}
                     </div>
                 ) : sessions.length === 0 ? (
-                    <div className="bg-ivory/50 border-border/40 flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-8 text-center">
+                    <div className="bg-card/50 border-border/40 flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-8 text-center">
                         <Text size="4" color="stone" className="mb-6 max-w-xs">
                             {t("noSessions")}
                         </Text>
                         <Button
                             onClick={handleStartSession}
                             disabled={createSession.isPending}
-                            className="bg-terracotta whisper-shadow rounded-xl px-8 font-serif"
+                            className="bg-primary whisper-shadow rounded-xl px-8 font-serif"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             {t("startFirst")}
@@ -305,7 +306,7 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
                                 {t("joinCode")}
                             </Text>
                             <div className="bg-background ring-border/20 flex h-16 items-center justify-center rounded-2xl ring-1">
-                                <span className="text-near-black font-mono text-3xl font-bold tracking-[0.2em]">
+                                <span className="text-foreground font-mono text-3xl font-bold tracking-[0.2em]">
                                     {classData.code}
                                 </span>
                             </div>
@@ -315,7 +316,7 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
 
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-1">
-                                <div className="text-stone-gray flex items-center gap-2">
+                                <div className="text-muted-foreground flex items-center gap-2">
                                     <Users className="h-4 w-4" />
                                     <Text
                                         size="1"
@@ -328,7 +329,7 @@ export function ClassOverviewPage({ classId }: { classId: string }) {
                                 <Heading size="6">{classData.memberCount}</Heading>
                             </div>
                             <div className="space-y-1">
-                                <div className="text-stone-gray flex items-center gap-2">
+                                <div className="text-muted-foreground flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
                                     <Text
                                         size="1"

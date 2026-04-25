@@ -86,13 +86,13 @@ function StudentRow({
 
     return (
         <div className="space-y-3">
-            <div className="group border-border/60 bg-ivory hover:ring-terracotta/20 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border p-6 transition-all duration-300 hover:ring-1">
+            <div className="group border-border/60 bg-card hover:ring-primary/20 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border p-6 transition-all duration-300 hover:ring-1">
                 <div className="flex min-w-0 items-center gap-4">
                     {showCheckbox && (
                         <Checkbox checked={isSelected} onCheckedChange={onToggleSelect} />
                     )}
                     <Avatar className="border-border/40 h-10 w-10 shrink-0 border">
-                        <AvatarFallback className="bg-background text-stone-gray text-[11px] font-bold tracking-wider uppercase">
+                        <AvatarFallback className="bg-background text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
                             {getInitials(studentName)}
                         </AvatarFallback>
                     </Avatar>
@@ -121,7 +121,7 @@ function StudentRow({
                             variant="ghost"
                             size="sm"
                             onClick={onToggleAudit}
-                            className="text-stone-gray hover:text-near-black"
+                            className="text-muted-foreground hover:text-foreground"
                             title={t("history")}
                         >
                             <History className="h-4 w-4" />
@@ -165,8 +165,8 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
     return (
         <div className="border-border/40 flex flex-wrap items-center gap-x-8 gap-y-3 border-b pb-8">
             <div className="flex items-center gap-2.5">
-                <Users className="text-stone-gray h-4.5 w-4.5" />
-                <Text size="5" weight="medium" className="text-near-black">
+                <Users className="text-muted-foreground h-4.5 w-4.5" />
+                <Text size="5" weight="medium" className="text-foreground">
                     {total}
                 </Text>
                 <Text size="1" weight="bold" color="stone" className="tracking-widest uppercase">
@@ -180,7 +180,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             className="h-2 w-2 rounded-full"
                             style={{ backgroundColor: presentStatus.color }}
                         />
-                        <Text size="2" weight="medium" className="text-near-black">
+                        <Text size="2" weight="medium" className="text-foreground">
                             {presentCount} {presentStatus.label}
                         </Text>
                     </div>
@@ -191,7 +191,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             className="h-2 w-2 rounded-full"
                             style={{ backgroundColor: lateStatus.color }}
                         />
-                        <Text size="2" weight="medium" className="text-near-black">
+                        <Text size="2" weight="medium" className="text-foreground">
                             {lateCount} {lateStatus.label}
                         </Text>
                     </div>
@@ -202,7 +202,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             className="h-2 w-2 rounded-full"
                             style={{ backgroundColor: absentStatus.color }}
                         />
-                        <Text size="2" weight="medium" className="text-near-black">
+                        <Text size="2" weight="medium" className="text-foreground">
                             {absentCount} {absentStatus.label}
                         </Text>
                     </div>
@@ -227,6 +227,7 @@ interface SessionPageProps {
 export function SessionPage({ sessionId, classData }: SessionPageProps) {
     const router = useRouter();
     const t = useTranslations("sessions");
+    const tCommon = useTranslations("common");
     const { session, isLoading: sessionLoading } = useSession(sessionId);
     const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(classData.id);
     const { recordMap, isLoading: recordsLoading } = useSessionAttendance(sessionId);
@@ -385,8 +386,8 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
     return (
         <div className="flex flex-col gap-8">
             {isFinalized && (
-                <div className="border-stone-gray/20 bg-ivory animate-fade-in flex items-center gap-3 rounded-xl border px-6 py-4">
-                    <Lock className="text-stone-gray h-5 w-5 shrink-0" />
+                <div className="border-muted/20 bg-card animate-fade-in flex items-center gap-3 rounded-xl border px-6 py-4">
+                    <Lock className="text-muted-foreground h-5 w-5 shrink-0" />
                     <Text size="2" color="olive" weight="medium">
                         {t("finalizedDesc")}
                     </Text>
@@ -396,7 +397,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
             {/* Read-only message for students */}
             {permissions.isStudent && (
                 <div className="border-border/40 bg-background/50 animate-fade-in flex items-center gap-3 rounded-xl border px-6 py-4">
-                    <Lock className="text-stone-gray h-5 w-5 shrink-0" />
+                    <Lock className="text-muted-foreground h-5 w-5 shrink-0" />
                     <Text size="2" color="olive" weight="medium">
                         {t("readOnlyStudent")}
                     </Text>
@@ -407,7 +408,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                 <div className="border-border/40 bg-background/50 flex flex-wrap items-end gap-10 rounded-2xl border p-8">
                     <div className="grid max-w-sm grid-cols-2 gap-8">
                         <div className="space-y-3">
-                            <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
+                            <Label className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase">
                                 {t("startTime")}
                             </Label>
                             <Input
@@ -429,11 +430,11 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                 disabled={
                                     isFinalized || updateSession.isPending || !permissions.canEdit
                                 }
-                                className="bg-background border-border/40 focus:border-terracotta h-12"
+                                className="bg-background border-border/40 focus:border-primary h-12"
                             />
                         </div>
                         <div className="space-y-3">
-                            <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
+                            <Label className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase">
                                 {t("endTime")}
                             </Label>
                             <Input
@@ -455,7 +456,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                 disabled={
                                     isFinalized || updateSession.isPending || !permissions.canEdit
                                 }
-                                className="bg-background border-border/40 focus:border-terracotta h-12"
+                                className="bg-background border-border/40 focus:border-primary h-12"
                             />
                         </div>
                     </div>
@@ -522,7 +523,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                     </Button>
                                 }
                             />
-                            <AlertDialogContent className="border-border/60 bg-ivory whisper-shadow max-w-md rounded-3xl">
+                            <AlertDialogContent className="border-border/60 bg-card whisper-shadow max-w-md rounded-3xl">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle className="font-serif">
                                         {t("finalizeConfirmTitle")}
@@ -533,11 +534,11 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter className="pt-6">
                                     <AlertDialogCancel className="border-border/60 rounded-xl">
-                                        {t("cancel")}
+                                        {tCommon("cancel")}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={handleFinalize}
-                                        className="bg-near-black text-ivory hover:bg-near-black/90 rounded-xl px-8"
+                                        className="rounded-xl px-8"
                                     >
                                         {t("finalizeAction")}
                                     </AlertDialogAction>
@@ -566,7 +567,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                     ))}
                 </div>
             ) : enrollments.length === 0 ? (
-                <div className="border-border/60 bg-ivory flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed p-12 text-center">
+                <div className="border-border/60 bg-card flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed p-12 text-center">
                     <Text size="4" color="olive" weight="medium">
                         {t("waiting")}
                     </Text>

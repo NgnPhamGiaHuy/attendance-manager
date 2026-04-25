@@ -25,7 +25,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
         <AlertDialogPrimitive.Backdrop
             data-slot="alert-dialog-overlay"
             className={cn(
-                "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 bg-near-black/20 fixed inset-0 isolate z-[300] backdrop-blur-[2px] transition-opacity duration-200",
+                "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 bg-foreground/20 fixed inset-0 isolate z-[300] backdrop-blur-[2px] transition-opacity duration-200",
                 className,
             )}
             {...props}
@@ -47,7 +47,7 @@ function AlertDialogContent({
                 data-slot="alert-dialog-content"
                 data-size={size}
                 className={cn(
-                    "bg-ivory text-near-black whisper-shadow ring-border/40 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-[301] grid w-full -translate-x-1/2 -translate-y-1/2 gap-8 rounded-[32px] p-10 ring-1 duration-200 outline-none data-[size=default]:max-w-md data-[size=sm]:max-w-sm",
+                    "bg-card text-foreground whisper-shadow ring-border/40 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-[301] grid w-full -translate-x-1/2 -translate-y-1/2 gap-8 rounded-[32px] p-10 ring-1 duration-200 outline-none data-[size=default]:max-w-md data-[size=sm]:max-w-sm",
                     className,
                 )}
                 {...props}
@@ -81,7 +81,7 @@ function AlertDialogMedia({ className, ...props }: React.ComponentProps<"div">) 
         <div
             data-slot="alert-dialog-media"
             className={cn(
-                "bg-ivory ring-border/20 mb-2 inline-flex size-12 items-center justify-center rounded-2xl ring-1 *:[svg:not([class*='size-'])]:size-6",
+                "bg-card ring-border/20 mb-2 inline-flex size-12 items-center justify-center rounded-2xl ring-1 *:[svg:not([class*='size-'])]:size-6",
                 className,
             )}
             {...props}

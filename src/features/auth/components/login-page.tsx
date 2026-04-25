@@ -37,7 +37,7 @@ export function LoginPage() {
 
                     <Suspense
                         fallback={
-                            <div className="bg-ivory whisper-shadow h-[300px] w-full animate-pulse rounded-3xl" />
+                            <div className="bg-card whisper-shadow h-[300px] w-full animate-pulse rounded-3xl" />
                         }
                     >
                         <AuthForm />
@@ -46,14 +46,18 @@ export function LoginPage() {
             </div>
 
             {/* Right side editorial area */}
-            <div className="bg-near-black relative hidden items-center justify-center overflow-hidden p-20 lg:flex lg:flex-1">
-                <div className="absolute inset-0 bg-[#30302e] opacity-20" />
+            <div className="bg-foreground relative hidden items-center justify-center overflow-hidden p-20 lg:flex lg:flex-1">
+                <div className="bg-dark-surface/20 absolute inset-0" />
                 <div className="relative z-10 max-w-lg space-y-8">
                     <div className="space-y-6">
-                        <Heading size="8" color="default" className="text-ivory leading-[1.1]">
+                        <Heading
+                            size="8"
+                            color="default"
+                            className="text-card-foreground leading-[1.1]"
+                        >
                             &quot;{t("quote")}&quot;
                         </Heading>
-                        <div className="bg-terracotta h-px w-12" />
+                        <div className="bg-primary h-px w-12" />
                         <Text size="5" color="stone" className="leading-relaxed" as="p">
                             {t("quoteDesc")}
                         </Text>
@@ -61,7 +65,7 @@ export function LoginPage() {
 
                     <div className="pt-8">
                         <div className="flex items-center gap-4">
-                            <span className="bg-stone-gray/30 h-px w-4" />
+                            <span className="bg-muted/30 h-px w-4" />
                             <Text
                                 size="1"
                                 weight="bold"

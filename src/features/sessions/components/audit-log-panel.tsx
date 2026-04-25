@@ -64,9 +64,9 @@ export function AuditLogPanel({ auditTrail, statuses, isExpanded, onToggle }: Au
                     Change History ({auditTrail.length})
                 </Text>
                 {isExpanded ? (
-                    <ChevronUp className="text-stone-gray h-4 w-4" />
+                    <ChevronUp className="text-muted-foreground h-4 w-4" />
                 ) : (
-                    <ChevronDown className="text-stone-gray h-4 w-4" />
+                    <ChevronDown className="text-muted-foreground h-4 w-4" />
                 )}
             </Button>
 
@@ -101,7 +101,7 @@ export function AuditLogPanel({ auditTrail, statuses, isExpanded, onToggle }: Au
                                     )}
 
                                     {/* Arrow */}
-                                    <ArrowRight className="text-stone-gray h-4 w-4" />
+                                    <ArrowRight className="text-muted-foreground h-4 w-4" />
 
                                     {/* New Status Badge */}
                                     {newStatus && (

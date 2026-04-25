@@ -76,12 +76,12 @@ export function CreateClassSheet() {
             />
             <SheetContent side="right">
                 {/* Decorative header band */}
-                <div className="from-terracotta/8 to-terracotta/3 border-border/40 absolute inset-x-0 top-0 h-1.5 rounded-t-[inherit] bg-gradient-to-r" />
+                <div className="from-primary/10 to-primary/5 border-border/40 absolute inset-x-0 top-0 h-1.5 rounded-t-[inherit] bg-gradient-to-r" />
 
                 <SheetHeader className="pb-4">
                     {/* Icon badge */}
-                    <div className="bg-terracotta/10 border-terracotta/20 mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border">
-                        <BookOpen className="text-terracotta h-5 w-5" />
+                    <div className="bg-primary/10 border-primary/20 mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border">
+                        <BookOpen className="text-primary h-5 w-5" />
                     </div>
 
                     <SheetTitle>{t("createTitle")}</SheetTitle>
@@ -97,14 +97,14 @@ export function CreateClassSheet() {
                         <div className="flex items-center justify-between">
                             <Label
                                 htmlFor="name"
-                                className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                             >
                                 {t("className")}
                             </Label>
                             <Text
                                 size="1"
                                 color="stone"
-                                className={nameValue.length > 45 ? "text-terracotta" : ""}
+                                className={nameValue.length > 45 ? "text-primary" : ""}
                             >
                                 {nameValue.length}/50
                             </Text>
@@ -137,14 +137,14 @@ export function CreateClassSheet() {
                         <div className="flex items-center justify-between">
                             <Label
                                 htmlFor="description"
-                                className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                             >
                                 {t("classDesc")}
                             </Label>
                             <Text
                                 size="1"
                                 color="stone"
-                                className={descValue.length > 90 ? "text-terracotta" : ""}
+                                className={descValue.length > 90 ? "text-primary" : ""}
                             >
                                 {descValue.length}/100
                             </Text>
@@ -174,7 +174,7 @@ export function CreateClassSheet() {
 
                     {/* Hint card */}
                     <div className="bg-background border-border/60 flex items-start gap-3 rounded-2xl border p-4">
-                        <Sparkles className="text-terracotta/70 mt-0.5 h-4 w-4 shrink-0" />
+                        <Sparkles className="text-primary/70 mt-0.5 h-4 w-4 shrink-0" />
                         <Text size="2" color="olive" className="leading-relaxed">
                             {t("createHint")}
                         </Text>
@@ -187,7 +187,7 @@ export function CreateClassSheet() {
                             <Button
                                 type="button"
                                 variant="ghost"
-                                className="text-stone-gray hover:text-near-black w-full rounded-xl font-serif text-sm font-medium"
+                                className="text-muted-foreground hover:text-foreground w-full rounded-xl font-serif text-sm font-medium"
                             >
                                 {tCommon("cancel")}
                             </Button>

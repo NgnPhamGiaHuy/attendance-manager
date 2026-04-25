@@ -77,7 +77,7 @@ function ClassDetailsForm({
     };
 
     return (
-        <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
+        <Card className="border-border/40 bg-card whisper-shadow rounded-3xl">
             <CardHeader className="px-10 pt-10 pb-2">
                 <CardTitle size="6" className="font-serif">
                     {t("classDetails")}
@@ -91,14 +91,14 @@ function ClassDetailsForm({
                     <div className="space-y-3">
                         <Label
                             htmlFor="name"
-                            className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                            className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                         >
                             {t("className")}
                         </Label>
                         <Input
                             id="name"
                             {...register("name")}
-                            className="bg-background border-border/40 focus:border-terracotta focus:ring-terracotta/10 h-12 max-w-md"
+                            className="bg-background border-border/40 focus:border-primary focus:ring-primary/10 h-12 max-w-md"
                             disabled={updateClass.isPending}
                         />
                         {errors.name && (
@@ -110,14 +110,14 @@ function ClassDetailsForm({
                     <div className="space-y-3">
                         <Label
                             htmlFor="description"
-                            className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                            className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                         >
                             {t("description")}
                         </Label>
                         <Input
                             id="description"
                             {...register("description")}
-                            className="bg-background border-border/40 focus:border-terracotta focus:ring-terracotta/10 h-12 max-w-md"
+                            className="bg-background border-border/40 focus:border-primary focus:ring-primary/10 h-12 max-w-md"
                             disabled={updateClass.isPending}
                         />
                         {errors.description && (
@@ -140,7 +140,7 @@ function ClassDetailsForm({
                             <div className="space-y-3">
                                 <Label
                                     htmlFor="defaultStartTime"
-                                    className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                    className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
                                     {t("defaultStart")}
                                 </Label>
@@ -148,7 +148,7 @@ function ClassDetailsForm({
                                     id="defaultStartTime"
                                     type="time"
                                     {...register("defaultStartTime")}
-                                    className="bg-background border-border/40 focus:border-terracotta focus:ring-terracotta/10 h-12"
+                                    className="bg-background border-border/40 focus:border-primary focus:ring-primary/10 h-12"
                                     disabled={updateClass.isPending}
                                 />
                                 {errors.defaultStartTime && (
@@ -160,7 +160,7 @@ function ClassDetailsForm({
                             <div className="space-y-3">
                                 <Label
                                     htmlFor="defaultEndTime"
-                                    className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
+                                    className="text-muted-foreground ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
                                     {t("defaultEnd")}
                                 </Label>
@@ -168,7 +168,7 @@ function ClassDetailsForm({
                                     id="defaultEndTime"
                                     type="time"
                                     {...register("defaultEndTime")}
-                                    className="bg-background border-border/40 focus:border-terracotta focus:ring-terracotta/10 h-12"
+                                    className="bg-background border-border/40 focus:border-primary focus:ring-primary/10 h-12"
                                     disabled={updateClass.isPending}
                                 />
                                 {errors.defaultEndTime && (
@@ -236,7 +236,7 @@ function DangerZone({ classId }: { classId: string }) {
                             </Button>
                         }
                     />
-                    <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-3xl p-8">
+                    <AlertDialogContent className="border-border/40 bg-card whisper-shadow rounded-3xl p-8">
                         <AlertDialogHeader className="gap-2">
                             <AlertDialogTitle className="font-serif">
                                 {t("deleteConfirmTitle")}
@@ -280,7 +280,7 @@ export function SettingsPage({ classId }: { classId: string }) {
                     defaultEndTime: classData.defaultEndTime,
                 }}
             />
-            <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
+            <Card className="border-border/40 bg-card whisper-shadow rounded-3xl">
                 <CardContent className="px-10 pt-10 pb-10">
                     <StatusEditor
                         classId={classId}
@@ -289,7 +289,7 @@ export function SettingsPage({ classId }: { classId: string }) {
                     />
                 </CardContent>
             </Card>
-            <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
+            <Card className="border-border/40 bg-card whisper-shadow rounded-3xl">
                 <CardContent className="px-10 pt-10 pb-10">
                     <ScoringRulesForm
                         classId={classId}
