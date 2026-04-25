@@ -86,7 +86,17 @@
         "finalizedSessions": "{count} finalized {count, plural, one {session} other {sessions}}",
         "activeStudents": "{count} active {count, plural, one {student} other {students}}",
         "inactiveMembers": "Inactive Members ({count})",
-        "inactiveDesc": "These students have been deactivated but their historical records are preserved."
+        "inactiveDesc": "These students have been deactivated but their historical records are preserved.",
+        "exportTitle": "Class Attendance Report",
+        "classNameLabel": "Class Name",
+        "exportDateLabel": "Export Date",
+        "studentEmail": "Student Email",
+        "sessionsAttended": "Sessions Attended",
+        "sessionsEligible": "Sessions Eligible",
+        "totalAbsences": "Total Absences",
+        "finalScore": "Final Score",
+        "exportSuccess": "Attendance records exported successfully!",
+        "exportFailed": "Failed to export attendance records. Please try again."
     },
     "members": {
         "teacher": "Teacher",

@@ -361,6 +361,14 @@ export const attendanceApi = {
             onError,
         );
     },
+    /**
+     * Fetch all attendance records for a class (for history & data exports).
+     */
+    getByClassId: async (classId: string): Promise<AttendanceRecord[]> => {
+        const q = query(Collections.attendanceRecords(), where("classId", "==", classId));
+        const snap = await getDocs(q);
+        return snap.docs.map((d) => ({ ...d.data(), id: d.id }) as AttendanceRecord);
+    },
 };
 
 /**

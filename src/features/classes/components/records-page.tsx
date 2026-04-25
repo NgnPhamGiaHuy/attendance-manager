@@ -12,6 +12,11 @@ import { useEnrollments } from "@/features/classes/hooks/useEnrollments";
 import { attendanceApi } from "@/features/sessions/api/sessionApi";
 import { useClassSessions } from "@/features/sessions/hooks/useSessions";
 import { formatDate } from "@/lib/utils";
+import { usePermissions } from "@/features/classes/hooks/usePermissions";
+import { Button } from "@/components/ui/button";
+import { exportAttendanceToExcel } from "@/features/sessions/services/exportService";
+import { toast } from "sonner";
+import { Download } from "lucide-react";
 
 import type { AttendanceRecord, Session, StatusDefinition } from "@/types";
 
@@ -169,8 +174,33 @@ export function RecordsPage({ classId }: { classId: string }) {
     const { data: classData } = useClass(classId);
     const { sessions, isLoading: sessionsLoading } = useClassSessions(classId);
     const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(classId);
+    const { isTeacher, isTA } = usePermissions(classId);
+    const [isExporting, setIsExporting] = useState(false);
 
     const finalizedSessions = useMemo(() => sessions.filter((s) => s.isFinalized), [sessions]);
+
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            await exportAttendanceToExcel(classId, classData.name, {
+                reportTitle: t("exportTitle"),
+                classNameLabel: t("classNameLabel"),
+                exportDateLabel: t("exportDateLabel"),
+                studentNameLabel: t("studentName"),
+                studentEmailLabel: t("studentEmail"),
+                sessionsAttendedLabel: t("sessionsAttended"),
+                sessionsEligibleLabel: t("sessionsEligible"),
+                totalAbsencesLabel: t("totalAbsences"),
+                finalScoreLabel: t("finalScore"),
+            });
+            toast.success(t("exportSuccess"));
+        } catch (error) {
+            console.error("[handleExport] Failed:", error);
+            toast.error(t("exportFailed"));
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     // Separate active and inactive enrollments
     const activeEnrollments = useMemo(() => enrollments.filter((e) => e.isActive), [enrollments]);
@@ -193,11 +223,23 @@ export function RecordsPage({ classId }: { classId: string }) {
         <div className="space-y-8">
             {/* Active Members Section */}
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <Heading size="2" color="stone" className="uppercase">
                         {t("finalizedSessions", { count: finalizedSessions.length })} ·{" "}
                         {t("activeStudents", { count: activeEnrollments.length })}
                     </Heading>
+                    {(isTeacher || isTA) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleExport}
+                            disabled={isExporting}
+                            className="bg-card border-border/40 hover:bg-secondary hover:text-secondary-foreground flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold"
+                        >
+                            <Download className="h-3.5 w-3.5" />
+                            {isExporting ? "Exporting..." : "Export Excel"}
+                        </Button>
+                    )}
                 </div>
                 <RecordsMatrix
                     classId={classId}

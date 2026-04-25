@@ -86,7 +86,17 @@
         "finalizedSessions": "{count} phiên đã kết thúc",
         "activeStudents": "{count} sinh viên đang hoạt động",
         "inactiveMembers": "Thành viên không hoạt động ({count})",
-        "inactiveDesc": "Những sinh viên này đã bị hủy kích hoạt nhưng hồ sơ lịch sử của họ vẫn được lưu trữ."
+        "inactiveDesc": "Những sinh viên này đã bị hủy kích hoạt nhưng hồ sơ lịch sử của họ vẫn được lưu trữ.",
+        "exportTitle": "Báo cáo Điểm danh Lớp học",
+        "classNameLabel": "Tên Lớp học",
+        "exportDateLabel": "Ngày Xuất file",
+        "studentEmail": "Email Sinh viên",
+        "sessionsAttended": "Số Phiên Tham gia",
+        "sessionsEligible": "Số Phiên Đủ điều kiện",
+        "totalAbsences": "Tổng số Lần vắng",
+        "finalScore": "Điểm Tổng kết",
+        "exportSuccess": "Xuất hồ sơ điểm danh thành công!",
+        "exportFailed": "Xuất hồ sơ điểm danh thất bại. Vui lòng thử lại."
     },
     "members": {
         "teacher": "Giáo viên",

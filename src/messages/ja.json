@@ -86,7 +86,17 @@
         "finalizedSessions": "{count}回 の確定済み講義",
         "activeStudents": "{count}人 のアクティブな受講生",
         "inactiveMembers": "非アクティブなメンバー ({count})",
-        "inactiveDesc": "これらの受講生は無効化されていますが、過去の履歴データは保持されます。"
+        "inactiveDesc": "これらの受講生は無効化されていますが、過去の履歴データは保持されます。",
+        "exportTitle": "クラス出席レポート",
+        "classNameLabel": "クラス名",
+        "exportDateLabel": "エクスポート日",
+        "studentEmail": "メールアドレス",
+        "sessionsAttended": "出席講義数",
+        "sessionsEligible": "対象講義数",
+        "totalAbsences": "合計欠席数",
+        "finalScore": "最終スコア",
+        "exportSuccess": "出席記録のエクスポートに成功しました！",
+        "exportFailed": "出席記録のエクスポートに失敗しました。もう一度お試しください。"
     },
     "members": {
         "teacher": "教員",
