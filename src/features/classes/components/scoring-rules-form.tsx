@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 
 import { toast } from "sonner";
@@ -48,6 +49,7 @@ function computeScore(rules: ScoringRules, weightedAbsences: number): number {
  * Includes live preview of score calculation with sample absence values.
  */
 export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRulesFormProps) {
+    const t = useTranslations("classSettings");
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<FormData>({
@@ -75,17 +77,17 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
 
         const basePoints = parseInt(formData.basePoints, 10);
         if (isNaN(basePoints) || basePoints < 1 || basePoints > 1000) {
-            newErrors.basePoints = "Must be between 1 and 1000";
+            newErrors.basePoints = t("basePointsError");
         }
 
         const allowedAbsences = parseInt(formData.allowedAbsences, 10);
         if (isNaN(allowedAbsences) || allowedAbsences < 0 || allowedAbsences > 50) {
-            newErrors.allowedAbsences = "Must be between 0 and 50";
+            newErrors.allowedAbsences = t("allowedAbsencesError");
         }
 
         const penaltyPerAbsence = parseFloat(formData.penaltyPerAbsence);
         if (isNaN(penaltyPerAbsence) || penaltyPerAbsence < 0 || penaltyPerAbsence > 100) {
-            newErrors.penaltyPerAbsence = "Must be between 0 and 100";
+            newErrors.penaltyPerAbsence = t("penaltyError");
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -103,15 +105,15 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
             };
 
             await classApi.saveScoringRules(classId, rules);
-            toast.success("Scoring rules updated");
+            toast.success(t("saveRulesSuccess"));
             setIsEditing(false);
             onUpdate();
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Failed to update scoring rules");
+            toast.error(error instanceof Error ? error.message : t("saveRulesFailed"));
         } finally {
             setIsSaving(false);
         }
-    }, [classId, formData, onUpdate]);
+    }, [classId, formData, onUpdate, t]);
 
     // Live preview calculation
     const previewRules: ScoringRules = {
@@ -130,41 +132,41 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                 <div className="flex items-center justify-between">
                     <div>
                         <Heading size="3" className="mb-2">
-                            Scoring Rules
+                            {t("scoringRules")}
                         </Heading>
                         <Text size="3" color="olive">
-                            Configure how attendance affects student scores.
+                            {t("scoringRulesDesc")}
                         </Text>
                     </div>
                     <Button onClick={handleEdit} variant="outline">
-                        Edit Rules
+                        {t("editRules")}
                     </Button>
                 </div>
 
                 <div className="border-border/40 bg-ivory whisper-shadow grid grid-cols-2 gap-6 rounded-2xl border p-6 md:grid-cols-4">
                     <div>
                         <Text size="1" weight="bold" color="stone" className="mb-2 uppercase">
-                            Base Points
+                            {t("basePoints")}
                         </Text>
                         <Heading size="4">{currentRules.basePoints}</Heading>
                     </div>
                     <div>
                         <Text size="1" weight="bold" color="stone" className="mb-2 uppercase">
-                            Allowed Absences
+                            {t("allowedAbsences")}
                         </Text>
                         <Heading size="4">{currentRules.allowedAbsences}</Heading>
                     </div>
                     <div>
                         <Text size="1" weight="bold" color="stone" className="mb-2 uppercase">
-                            Penalty / Absence
+                            {t("penaltyPerAbsence")}
                         </Text>
                         <Heading size="4">{currentRules.penaltyPerAbsence}</Heading>
                     </div>
                     <div>
                         <Text size="1" weight="bold" color="stone" className="mb-2 uppercase">
-                            Cap at Zero
+                            {t("capAtZero")}
                         </Text>
-                        <Heading size="4">{currentRules.capAtZero ? "Yes" : "No"}</Heading>
+                        <Heading size="4">{currentRules.capAtZero ? t("yes") : t("no")}</Heading>
                     </div>
                 </div>
             </div>
@@ -175,10 +177,10 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
         <div className="space-y-6">
             <div>
                 <Heading size="3" className="mb-2">
-                    Edit Scoring Rules
+                    {t("editScoringRules")}
                 </Heading>
                 <Text size="3" color="olive">
-                    Configure how attendance affects student scores.
+                    {t("scoringRulesDesc")}
                 </Text>
             </div>
 
@@ -186,7 +188,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                 {/* Form Fields */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <Label htmlFor="basePoints">Base Points</Label>
+                        <Label htmlFor="basePoints">{t("basePoints")}</Label>
                         <Input
                             id="basePoints"
                             type="number"
@@ -203,12 +205,12 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                             </Text>
                         )}
                         <Text size="1" color="olive" className="mt-1">
-                            Starting score for all students (1-1000)
+                            {t("startingScore")}
                         </Text>
                     </div>
 
                     <div>
-                        <Label htmlFor="allowedAbsences">Allowed Absences</Label>
+                        <Label htmlFor="allowedAbsences">{t("allowedAbsences")}</Label>
                         <Input
                             id="allowedAbsences"
                             type="number"
@@ -225,14 +227,14 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                             </Text>
                         )}
                         <Text size="1" color="olive" className="mt-1">
-                            Grace period before penalties apply (0-50)
+                            {t("gracePeriod")}
                         </Text>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <Label htmlFor="penaltyPerAbsence">Penalty per Absence</Label>
+                        <Label htmlFor="penaltyPerAbsence">{t("penaltyPerAbsence")}</Label>
                         <Input
                             id="penaltyPerAbsence"
                             type="number"
@@ -250,12 +252,12 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                             </Text>
                         )}
                         <Text size="1" color="olive" className="mt-1">
-                            Points deducted per excess absence (0-100)
+                            {t("excessAbsence")}
                         </Text>
                     </div>
 
                     <div>
-                        <Label htmlFor="capAtZero">Cap at Zero</Label>
+                        <Label htmlFor="capAtZero">{t("capAtZero")}</Label>
                         <div className="flex items-center gap-3 pt-2">
                             <Checkbox
                                 id="capAtZero"
@@ -265,7 +267,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                                 }
                             />
                             <Text size="2" color="olive">
-                                Prevent scores from going below zero
+                                {t("preventBelowZero")}
                             </Text>
                         </div>
                     </div>
@@ -274,7 +276,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                 {/* Live Preview */}
                 <div className="border-border/40 bg-background/50 space-y-3 rounded-xl border p-4">
                     <Text size="2" weight="bold" color="stone" className="uppercase">
-                        Live Preview
+                        {t("livePreview")}
                     </Text>
                     <div className="grid grid-cols-5 gap-3">
                         {sampleAbsences.map((absences) => {
@@ -285,7 +287,7 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                                     className="bg-ivory border-border/30 rounded-lg border p-3 text-center"
                                 >
                                     <Text size="1" color="olive" className="mb-1">
-                                        {absences} {absences === 1 ? "absence" : "absences"}
+                                        {t("absence", { count: absences })}
                                     </Text>
                                     <Heading
                                         size="4"
@@ -300,18 +302,21 @@ export function ScoringRulesForm({ classId, currentRules, onUpdate }: ScoringRul
                         })}
                     </div>
                     <Text size="1" color="olive" className="italic">
-                        Formula: max(0, {previewRules.basePoints} − max(0, absences −{" "}
-                        {previewRules.allowedAbsences}) × {previewRules.penaltyPerAbsence})
+                        {t("formula", {
+                            basePoints: previewRules.basePoints,
+                            allowedAbsences: previewRules.allowedAbsences,
+                            penalty: previewRules.penaltyPerAbsence,
+                        })}
                     </Text>
                 </div>
 
                 {/* Actions */}
                 <div className="flex justify-end gap-2">
                     <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={isSaving}>
-                        Cancel
+                        {t("cancel")}
                     </Button>
                     <Button onClick={handleSave} disabled={isSaving}>
-                        {isSaving ? "Saving..." : "Save Rules"}
+                        {isSaving ? t("saving") : t("saveRules")}
                     </Button>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -25,19 +26,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Text } from "@/components/ui/typography";
 import { useCreateClass } from "@/features/classes/hooks/useClasses";
 
-const formSchema = z.object({
-    name: z
-        .string()
-        .min(2, "Class name must be at least 2 characters")
-        .max(50, "Class name must be less than 50 characters"),
-    description: z.string().max(100, "Description must be less than 100 characters").optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
 export function CreateClassSheet() {
+    const t = useTranslations("classes");
+    const tCommon = useTranslations("common");
     const [open, setOpen] = useState(false);
     const createClass = useCreateClass();
+
+    const formSchema = z.object({
+        name: z.string().min(2, t("nameMin")).max(50, t("nameMax")),
+        description: z.string().max(100, t("descMax")).optional(),
+    });
+
+    type FormData = z.infer<typeof formSchema>;
 
     const {
         register,
@@ -55,12 +55,12 @@ export function CreateClassSheet() {
     const onSubmit = async (data: FormData) => {
         try {
             await createClass.mutateAsync(data);
-            toast.success("Class created successfully!");
+            toast.success(t("createSuccess"));
             setOpen(false);
             reset();
         } catch (error) {
             console.error(error);
-            toast.error("Failed to create class. Please try again.");
+            toast.error(t("createFailed"));
         }
     };
 
@@ -68,9 +68,9 @@ export function CreateClassSheet() {
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
                 render={
-                    <Button className="whisper-shadow rounded-xl px-6">
+                    <Button className="whisper-shadow h-11 rounded-xl px-6 text-sm font-medium">
                         <Plus className="mr-2 h-4 w-4" />
-                        New Class
+                        {t("create")}
                     </Button>
                 }
             />
@@ -84,11 +84,8 @@ export function CreateClassSheet() {
                         <BookOpen className="text-terracotta h-5 w-5" />
                     </div>
 
-                    <SheetTitle>Create a New Class</SheetTitle>
-                    <SheetDescription>
-                        Give your class a name and an optional description. You can configure custom
-                        statuses and grading rules from Settings later.
-                    </SheetDescription>
+                    <SheetTitle>{t("createTitle")}</SheetTitle>
+                    <SheetDescription>{t("createDesc")}</SheetDescription>
                 </SheetHeader>
 
                 <form
@@ -102,7 +99,7 @@ export function CreateClassSheet() {
                                 htmlFor="name"
                                 className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                             >
-                                Class Name
+                                {t("className")}
                             </Label>
                             <Text
                                 size="1"
@@ -114,7 +111,7 @@ export function CreateClassSheet() {
                         </div>
                         <Input
                             id="name"
-                            placeholder="e.g. CS101: Intro to Computer Science"
+                            placeholder={t("classNamePlaceholder")}
                             {...register("name")}
                             disabled={createClass.isPending}
                             autoFocus
@@ -130,7 +127,7 @@ export function CreateClassSheet() {
                             </Text>
                         ) : (
                             <Text size="1" color="stone" className="ml-1">
-                                This will be visible to all enrolled students.
+                                {t("visibleToStudents")}
                             </Text>
                         )}
                     </div>
@@ -142,10 +139,7 @@ export function CreateClassSheet() {
                                 htmlFor="description"
                                 className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                             >
-                                Description
-                                <span className="text-stone-gray/60 ml-1.5 tracking-normal normal-case">
-                                    (optional)
-                                </span>
+                                {t("classDesc")}
                             </Label>
                             <Text
                                 size="1"
@@ -157,7 +151,7 @@ export function CreateClassSheet() {
                         </div>
                         <Textarea
                             id="description"
-                            placeholder="e.g. Fall 2026, Section 2 — Mon/Wed 10–11:30am"
+                            placeholder={t("classDescPlaceholder")}
                             {...register("description")}
                             disabled={createClass.isPending}
                             rows={3}
@@ -173,7 +167,7 @@ export function CreateClassSheet() {
                             </Text>
                         ) : (
                             <Text size="1" color="stone" className="ml-1">
-                                Helps students identify the right class.
+                                {t("helpIdentify")}
                             </Text>
                         )}
                     </div>
@@ -182,8 +176,7 @@ export function CreateClassSheet() {
                     <div className="bg-background border-border/60 flex items-start gap-3 rounded-2xl border p-4">
                         <Sparkles className="text-terracotta/70 mt-0.5 h-4 w-4 shrink-0" />
                         <Text size="2" color="olive" className="leading-relaxed">
-                            After creating, you can set up custom attendance statuses, scoring
-                            rules, and invite students from the class settings.
+                            {t("createHint")}
                         </Text>
                     </div>
                 </form>
@@ -194,27 +187,28 @@ export function CreateClassSheet() {
                             <Button
                                 type="button"
                                 variant="ghost"
-                                className="text-stone-gray hover:text-near-black rounded-xl px-6"
+                                className="text-stone-gray hover:text-near-black w-full rounded-xl font-serif text-sm font-medium"
                             >
-                                Cancel
+                                {tCommon("cancel")}
                             </Button>
                         }
                     />
                     <Button
                         type="submit"
-                        disabled={createClass.isPending || nameValue.trim().length < 2}
+                        size="lg"
+                        disabled={createClass.isPending}
                         onClick={handleSubmit(onSubmit)}
-                        className="whisper-shadow flex-1 rounded-xl text-base"
+                        className="whisper-shadow w-full rounded-2xl font-serif font-semibold"
                     >
                         {createClass.isPending ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Creating…
+                                {t("creating")}
                             </>
                         ) : (
                             <>
                                 <Plus className="mr-2 h-4 w-4" />
-                                Create Class
+                                {t("create")}
                             </>
                         )}
                     </Button>

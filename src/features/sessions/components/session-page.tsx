@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Timestamp } from "firebase/firestore";
@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatusChipRow } from "@/components/ui/status-chip";
 import { Heading, Text } from "@/components/ui/typography";
 import { useEnrollments } from "@/features/classes/hooks/useEnrollments";
+import { usePermissions } from "@/features/classes/hooks/usePermissions";
 import { sessionApi } from "@/features/sessions/api/sessionApi";
 import { AuditLogPanel } from "@/features/sessions/components/audit-log-panel";
 import { BulkActionToolbar } from "@/features/sessions/components/bulk-action-toolbar";
@@ -39,6 +40,7 @@ import {
     useSessionAttendance,
     useUpdateSession,
 } from "@/features/sessions/hooks/useSessions";
+import { useRouter } from "@/i18n/routing";
 import { formatTime, getInitials } from "@/lib/utils";
 
 import type { AttendanceRecord, Class, StatusDefinition } from "@/types";
@@ -78,6 +80,7 @@ function StudentRow({
     onToggleAudit,
     showAuditToggle,
 }: StudentRowProps) {
+    const t = useTranslations("sessions");
     const hasAuditTrail =
         currentRecord && currentRecord.auditTrail && currentRecord.auditTrail.length > 0;
 
@@ -119,7 +122,7 @@ function StudentRow({
                             size="sm"
                             onClick={onToggleAudit}
                             className="text-stone-gray hover:text-near-black"
-                            title="View change history"
+                            title={t("history")}
                         >
                             <History className="h-4 w-4" />
                         </Button>
@@ -150,6 +153,7 @@ interface StatsBarProps {
 }
 
 function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
+    const t = useTranslations("sessions");
     const presentStatus = statuses.find((s) => s.isDefault);
     const presentCount = presentStatus ? (statusCounts[presentStatus.id] ?? 0) : 0;
     const absentStatus = statuses.find((s) => s.acronym === "A");
@@ -166,7 +170,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                     {total}
                 </Text>
                 <Text size="1" weight="bold" color="stone" className="tracking-widest uppercase">
-                    students
+                    {t("students")}
                 </Text>
             </div>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
@@ -177,7 +181,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             style={{ backgroundColor: presentStatus.color }}
                         />
                         <Text size="2" weight="medium" className="text-near-black">
-                            {presentCount} Present
+                            {presentCount} {presentStatus.label}
                         </Text>
                     </div>
                 )}
@@ -188,7 +192,7 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             style={{ backgroundColor: lateStatus.color }}
                         />
                         <Text size="2" weight="medium" className="text-near-black">
-                            {lateCount} Late
+                            {lateCount} {lateStatus.label}
                         </Text>
                     </div>
                 )}
@@ -199,13 +203,13 @@ function StatsBar({ total, marked, statuses, statusCounts }: StatsBarProps) {
                             style={{ backgroundColor: absentStatus.color }}
                         />
                         <Text size="2" weight="medium" className="text-near-black">
-                            {absentCount} Absent
+                            {absentCount} {absentStatus.label}
                         </Text>
                     </div>
                 )}
                 {unmarked > 0 && (
                     <Text size="2" color="stone" className="border-border/60 border-l pl-2 italic">
-                        {unmarked} unmarked
+                        {unmarked} {t("unmarked")}
                     </Text>
                 )}
             </div>
@@ -222,9 +226,13 @@ interface SessionPageProps {
 
 export function SessionPage({ sessionId, classData }: SessionPageProps) {
     const router = useRouter();
+    const t = useTranslations("sessions");
     const { session, isLoading: sessionLoading } = useSession(sessionId);
     const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(classData.id);
     const { recordMap, isLoading: recordsLoading } = useSessionAttendance(sessionId);
+
+    // Permission checks
+    const permissions = usePermissions(classData.id);
 
     const markAttendance = useMarkAttendance();
     const bulkMarkAttendance = useBulkMarkAttendance(sessionId);
@@ -318,13 +326,13 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
         setIsMarkingAll(true);
         try {
             await sessionApi.markAllWithStatus(sessionId, defaultStatus.id);
-            toast.success(`All students marked as ${defaultStatus.label}`);
+            toast.success(t("markAllSuccess", { status: defaultStatus.label }));
         } catch {
-            toast.error("Failed to mark all students.");
+            toast.error(t("markAllFailed"));
         } finally {
             setIsMarkingAll(false);
         }
-    }, [sessionId, defaultStatus]);
+    }, [sessionId, defaultStatus, t]);
 
     const handleMark = useCallback(
         (studentId: string, studentName: string, statusId: string) => {
@@ -380,17 +388,27 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                 <div className="border-stone-gray/20 bg-ivory animate-fade-in flex items-center gap-3 rounded-xl border px-6 py-4">
                     <Lock className="text-stone-gray h-5 w-5 shrink-0" />
                     <Text size="2" color="olive" weight="medium">
-                        This session has been finalized and is read-only.
+                        {t("finalizedDesc")}
                     </Text>
                 </div>
             )}
 
-            {session && (
+            {/* Read-only message for students */}
+            {permissions.isStudent && (
+                <div className="border-border/40 bg-background/50 animate-fade-in flex items-center gap-3 rounded-xl border px-6 py-4">
+                    <Lock className="text-stone-gray h-5 w-5 shrink-0" />
+                    <Text size="2" color="olive" weight="medium">
+                        {t("readOnlyStudent")}
+                    </Text>
+                </div>
+            )}
+
+            {session && permissions.canEdit && (
                 <div className="border-border/40 bg-background/50 flex flex-wrap items-end gap-10 rounded-2xl border p-8">
                     <div className="grid max-w-sm grid-cols-2 gap-8">
                         <div className="space-y-3">
                             <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
-                                Start Time
+                                {t("startTime")}
                             </Label>
                             <Input
                                 type="time"
@@ -403,18 +421,20 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                             id: sessionId,
                                             data: { startTime: val },
                                         });
-                                        toast.success("Start time updated.");
+                                        toast.success(t("updateSuccess"));
                                     } catch {
-                                        toast.error("Failed to update start time.");
+                                        toast.error(t("updateFailed"));
                                     }
                                 }}
-                                disabled={isFinalized || updateSession.isPending}
+                                disabled={
+                                    isFinalized || updateSession.isPending || !permissions.canEdit
+                                }
                                 className="bg-background border-border/40 focus:border-terracotta h-12"
                             />
                         </div>
                         <div className="space-y-3">
                             <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
-                                End Time
+                                {t("endTime")}
                             </Label>
                             <Input
                                 type="time"
@@ -427,12 +447,14 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                             id: sessionId,
                                             data: { endTime: val },
                                         });
-                                        toast.success("End time updated.");
+                                        toast.success(t("updateSuccess"));
                                     } catch {
-                                        toast.error("Failed to update end time.");
+                                        toast.error(t("updateFailed"));
                                     }
                                 }}
-                                disabled={isFinalized || updateSession.isPending}
+                                disabled={
+                                    isFinalized || updateSession.isPending || !permissions.canEdit
+                                }
                                 className="bg-background border-border/40 focus:border-terracotta h-12"
                             />
                         </div>
@@ -444,10 +466,10 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                             color="stone"
                             className="tracking-widest uppercase"
                         >
-                            Session Schedule
+                            {t("schedule")}
                         </Text>
                         <Text size="2" color="olive" className="mt-1 block">
-                            Times are used for self-check-in rules and student records.
+                            {t("scheduleDesc")}
                         </Text>
                     </div>
                 </div>
@@ -462,7 +484,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                 />
             )}
 
-            {!isFinalized && (
+            {!isFinalized && permissions.canMarkAttendance && (
                 <div className="flex flex-wrap items-center justify-between gap-6">
                     <div className="flex flex-wrap items-center gap-4">
                         <Button
@@ -473,8 +495,8 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                         >
                             <CheckCheck className="h-4.5 w-4.5" />
                             {isMarkingAll
-                                ? "Marking all…"
-                                : `Mark All ${defaultStatus?.label ?? "Present"}`}
+                                ? t("markingAll")
+                                : t("markAll", { status: defaultStatus?.label ?? t("present") })}
                         </Button>
 
                         <Button
@@ -483,50 +505,51 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                             className="gap-2.5 rounded-xl px-8 font-semibold"
                         >
                             <QrCode className="h-4.5 w-4.5" />
-                            QR Check-In
+                            {t("qrCheckIn")}
                         </Button>
                     </div>
 
-                    <AlertDialog>
-                        <AlertDialogTrigger
-                            render={
-                                <Button
-                                    className="whisper-shadow gap-2.5 rounded-xl px-8 font-semibold"
-                                    disabled={finalizeSession.isPending}
-                                >
-                                    <Lock className="h-4.5 w-4.5" />
-                                    Finalize Session
-                                </Button>
-                            }
-                        />
-                        <AlertDialogContent className="border-border/60 bg-ivory whisper-shadow max-w-md rounded-3xl">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle className="font-serif">
-                                    Finalize session?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription className="leading-relaxed">
-                                    Attendance records will be locked. This action ensures the
-                                    scoring engine can process the final results for this class.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="pt-6">
-                                <AlertDialogCancel className="border-border/60 rounded-xl">
-                                    Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={handleFinalize}
-                                    className="bg-near-black text-ivory hover:bg-near-black/90 rounded-xl px-8"
-                                >
-                                    Yes, Finalize
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    {permissions.canFinalizeSession && (
+                        <AlertDialog>
+                            <AlertDialogTrigger
+                                render={
+                                    <Button
+                                        className="whisper-shadow gap-2.5 rounded-xl px-8 font-semibold"
+                                        disabled={finalizeSession.isPending}
+                                    >
+                                        <Lock className="h-4.5 w-4.5" />
+                                        {t("finalize")}
+                                    </Button>
+                                }
+                            />
+                            <AlertDialogContent className="border-border/60 bg-ivory whisper-shadow max-w-md rounded-3xl">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="font-serif">
+                                        {t("finalizeConfirmTitle")}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="leading-relaxed">
+                                        {t("finalizeConfirmDesc")}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="pt-6">
+                                    <AlertDialogCancel className="border-border/60 rounded-xl">
+                                        {t("cancel")}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleFinalize}
+                                        className="bg-near-black text-ivory hover:bg-near-black/90 rounded-xl px-8"
+                                    >
+                                        {t("finalizeAction")}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
                 </div>
             )}
 
             {/* Bulk Action Toolbar */}
-            {!isFinalized && selectedIds.size > 0 && (
+            {!isFinalized && permissions.canMarkAttendance && selectedIds.size > 0 && (
                 <BulkActionToolbar
                     selectedIds={selectedIds}
                     statuses={statuses}
@@ -545,7 +568,7 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
             ) : enrollments.length === 0 ? (
                 <div className="border-border/60 bg-ivory flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed p-12 text-center">
                     <Text size="4" color="olive" weight="medium">
-                        Waiting for students to join…
+                        {t("waiting")}
                     </Text>
                     <div className="bg-background border-border/40 mt-4 rounded-lg border px-6 py-2">
                         <Text size="9" weight="bold" className="font-mono tracking-widest">
@@ -573,10 +596,14 @@ export function SessionPage({ sessionId, classData }: SessionPageProps) {
                                         statusId,
                                     )
                                 }
-                                isDisabled={isFinalized || markAttendance.isPending}
+                                isDisabled={
+                                    isFinalized ||
+                                    markAttendance.isPending ||
+                                    !permissions.canMarkAttendance
+                                }
                                 isSelected={selectedIds.has(enrollment.studentId)}
                                 onToggleSelect={() => handleToggleSelect(enrollment.studentId)}
-                                showCheckbox={!isFinalized}
+                                showCheckbox={!isFinalized && permissions.canMarkAttendance}
                                 isAuditExpanded={expandedAuditRecordId === enrollment.studentId}
                                 onToggleAudit={() =>
                                     setExpandedAuditRecordId(

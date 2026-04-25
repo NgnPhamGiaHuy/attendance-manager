@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -54,6 +55,7 @@ function StatusRow({
     isLastActive: boolean;
     onUpdate: () => void;
 }) {
+    const t = useTranslations("classSettings");
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [formData, setFormData] = useState<StatusFormData>({
@@ -84,23 +86,23 @@ function StatusRow({
         const newErrors: Partial<Record<keyof StatusFormData, string>> = {};
 
         if (formData.label.length < 1 || formData.label.length > 30) {
-            newErrors.label = "Label must be 1-30 characters";
+            newErrors.label = t("labelError");
         }
         if (formData.acronym.length < 1 || formData.acronym.length > 3) {
-            newErrors.acronym = "Acronym must be 1-3 characters";
+            newErrors.acronym = t("acronymError");
         }
         if (!/^#[0-9A-Fa-f]{6}$/.test(formData.color)) {
-            newErrors.color = "Must be valid hex color (#RRGGBB)";
+            newErrors.color = t("colorError");
         }
 
         const multiplier = parseFloat(formData.multiplier);
         if (isNaN(multiplier) || multiplier < 0 || multiplier > 1) {
-            newErrors.multiplier = "Must be between 0 and 1";
+            newErrors.multiplier = t("multiplierError");
         }
 
         const absenceWeight = parseFloat(formData.absenceWeight);
         if (isNaN(absenceWeight) || absenceWeight < 0 || absenceWeight > 1) {
-            newErrors.absenceWeight = "Must be between 0 and 1";
+            newErrors.absenceWeight = t("weightError");
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -117,31 +119,31 @@ function StatusRow({
                 absenceWeight,
                 isDefault: formData.isDefault,
             });
-            toast.success("Status updated");
+            toast.success(t("updateStatusSuccess"));
             setIsEditing(false);
             onUpdate();
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Failed to update status");
         }
-    }, [classId, status.id, formData, onUpdate]);
+    }, [classId, status.id, formData, onUpdate, t]);
 
     const handleDelete = useCallback(async () => {
         try {
             await classApi.deleteStatus(classId, status.id);
-            toast.success("Status archived");
+            toast.success(t("archiveStatusSuccess"));
             setIsDeleting(false);
             onUpdate();
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Failed to delete status");
         }
-    }, [classId, status.id, onUpdate]);
+    }, [classId, status.id, onUpdate, t]);
 
     if (isEditing) {
         return (
             <div className="border-border/40 bg-ivory whisper-shadow space-y-4 rounded-2xl border p-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <Label htmlFor={`label-${status.id}`}>Label</Label>
+                        <Label htmlFor={`label-${status.id}`}>{t("label")}</Label>
                         <Input
                             id={`label-${status.id}`}
                             value={formData.label}
@@ -155,7 +157,7 @@ function StatusRow({
                         )}
                     </div>
                     <div>
-                        <Label htmlFor={`acronym-${status.id}`}>Acronym</Label>
+                        <Label htmlFor={`acronym-${status.id}`}>{t("acronym")}</Label>
                         <Input
                             id={`acronym-${status.id}`}
                             value={formData.acronym}
@@ -175,7 +177,7 @@ function StatusRow({
 
                 <div className="grid grid-cols-3 gap-4">
                     <div>
-                        <Label htmlFor={`color-${status.id}`}>Color</Label>
+                        <Label htmlFor={`color-${status.id}`}>{t("color")}</Label>
                         <div className="flex gap-2">
                             <Input
                                 id={`color-${status.id}`}
@@ -201,7 +203,7 @@ function StatusRow({
                         )}
                     </div>
                     <div>
-                        <Label htmlFor={`multiplier-${status.id}`}>Multiplier</Label>
+                        <Label htmlFor={`multiplier-${status.id}`}>{t("multiplier")}</Label>
                         <Input
                             id={`multiplier-${status.id}`}
                             type="number"
@@ -220,7 +222,7 @@ function StatusRow({
                         )}
                     </div>
                     <div>
-                        <Label htmlFor={`absenceWeight-${status.id}`}>Absence Weight</Label>
+                        <Label htmlFor={`absenceWeight-${status.id}`}>{t("weight")}</Label>
                         <Input
                             id={`absenceWeight-${status.id}`}
                             type="number"
@@ -242,9 +244,9 @@ function StatusRow({
 
                 <div className="flex justify-end gap-2">
                     <Button variant="ghost" onClick={() => setIsEditing(false)}>
-                        Cancel
+                        {t("cancel")}
                     </Button>
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button onClick={handleSave}>{t("saveChanges")}</Button>
                 </div>
             </div>
         );
@@ -259,12 +261,13 @@ function StatusRow({
                 >
                     {status.acronym}
                 </Badge>
-                <div>
+                <div className="flex flex-col gap-0.5">
                     <Text size="4" weight="semibold">
                         {status.label}
                     </Text>
                     <Text size="2" color="olive">
-                        Multiplier: {status.multiplier} · Weight: {status.absenceWeight}
+                        {t("multiplier")}: {status.multiplier} · {t("weight")}:{" "}
+                        {status.absenceWeight}
                     </Text>
                 </div>
             </div>
@@ -277,39 +280,41 @@ function StatusRow({
                     className="text-stone-gray hover:text-near-black h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100"
                 >
                     <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Edit status</span>
+                    <span className="sr-only">{t("editStatus")}</span>
                 </Button>
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsDeleting(true)}
                     disabled={isLastActive}
-                    title={isLastActive ? "Cannot delete the last active status" : "Archive status"}
-                    className="text-stone-gray hover:text-terracotta hover:bg-terracotta/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-50"
+                    title={isLastActive ? t("cannotDeleteLast") : t("deleteStatus")}
+                    className="text-stone-gray hover:text-destructive hover:bg-destructive/5 h-9 w-9 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-50"
                 >
                     <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete status</span>
+                    <span className="sr-only">{t("deleteStatus")}</span>
                 </Button>
             </div>
 
             <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
                 <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-[32px] p-8">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Archive &quot;{status.label}&quot;?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            {t("archiveStatusTitle", { label: status.label })}
+                        </AlertDialogTitle>
                         <AlertDialogDescription className="pt-2 leading-relaxed">
-                            This status will be archived and hidden from new attendance records.
-                            Historical records using this status will be preserved.
+                            {t("archiveStatusDesc")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
                         <AlertDialogCancel className="border-border/60 rounded-xl px-6 font-serif">
-                            Cancel
+                            {t("cancel")}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
-                            className="bg-terracotta hover:bg-terracotta/90 rounded-xl px-6 font-serif"
+                            variant="destructive"
+                            className="rounded-xl px-6 font-serif"
                         >
-                            Archive Status
+                            {t("archiveStatus")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -321,6 +326,7 @@ function StatusRow({
 // ─── Add Status Form ──────────────────────────────────────────────────────────
 
 function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void }) {
+    const t = useTranslations("classSettings");
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState<StatusFormData>({
         label: "",
@@ -337,23 +343,23 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
         const newErrors: Partial<Record<keyof StatusFormData, string>> = {};
 
         if (formData.label.length < 1 || formData.label.length > 30) {
-            newErrors.label = "Label must be 1-30 characters";
+            newErrors.label = t("labelError");
         }
         if (formData.acronym.length < 1 || formData.acronym.length > 3) {
-            newErrors.acronym = "Acronym must be 1-3 characters";
+            newErrors.acronym = t("acronymError");
         }
         if (!/^#[0-9A-Fa-f]{6}$/.test(formData.color)) {
-            newErrors.color = "Must be valid hex color (#RRGGBB)";
+            newErrors.color = t("colorError");
         }
 
         const multiplier = parseFloat(formData.multiplier);
         if (isNaN(multiplier) || multiplier < 0 || multiplier > 1) {
-            newErrors.multiplier = "Must be between 0 and 1";
+            newErrors.multiplier = t("multiplierError");
         }
 
         const absenceWeight = parseFloat(formData.absenceWeight);
         if (isNaN(absenceWeight) || absenceWeight < 0 || absenceWeight > 1) {
-            newErrors.absenceWeight = "Must be between 0 and 1";
+            newErrors.absenceWeight = t("weightError");
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -370,7 +376,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
                 absenceWeight,
                 isDefault: formData.isDefault,
             });
-            toast.success("Status added");
+            toast.success(t("addStatusSuccess"));
             setIsAdding(false);
             setFormData({
                 label: "",
@@ -385,24 +391,24 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Failed to add status");
         }
-    }, [classId, formData, onAdd]);
+    }, [classId, formData, onAdd, t]);
 
     if (!isAdding) {
         return (
             <Button onClick={() => setIsAdding(true)} variant="outline" className="w-full">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Status
+                {t("addStatus")}
             </Button>
         );
     }
 
     return (
         <div className="border-border/40 bg-ivory whisper-shadow space-y-4 rounded-2xl border p-6">
-            <Heading size="4">Add New Status</Heading>
+            <Heading size="4">{t("addNewStatus")}</Heading>
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="new-label">Label</Label>
+                    <Label htmlFor="new-label">{t("label")}</Label>
                     <Input
                         id="new-label"
                         value={formData.label}
@@ -416,7 +422,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
                     )}
                 </div>
                 <div>
-                    <Label htmlFor="new-acronym">Acronym</Label>
+                    <Label htmlFor="new-acronym">{t("acronym")}</Label>
                     <Input
                         id="new-acronym"
                         value={formData.acronym}
@@ -436,7 +442,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
 
             <div className="grid grid-cols-3 gap-4">
                 <div>
-                    <Label htmlFor="new-color">Color</Label>
+                    <Label htmlFor="new-color">{t("color")}</Label>
                     <div className="flex gap-2">
                         <Input
                             id="new-color"
@@ -458,7 +464,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
                     )}
                 </div>
                 <div>
-                    <Label htmlFor="new-multiplier">Multiplier</Label>
+                    <Label htmlFor="new-multiplier">{t("multiplier")}</Label>
                     <Input
                         id="new-multiplier"
                         type="number"
@@ -475,7 +481,7 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
                     )}
                 </div>
                 <div>
-                    <Label htmlFor="new-absenceWeight">Absence Weight</Label>
+                    <Label htmlFor="new-absenceWeight">{t("weight")}</Label>
                     <Input
                         id="new-absenceWeight"
                         type="number"
@@ -503,9 +509,9 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
                         setErrors({});
                     }}
                 >
-                    Cancel
+                    {t("cancel")}
                 </Button>
-                <Button onClick={handleAdd}>Add Status</Button>
+                <Button onClick={handleAdd}>{t("addStatus")}</Button>
             </div>
         </div>
     );
@@ -518,6 +524,8 @@ function AddStatusForm({ classId, onAdd }: { classId: string; onAdd: () => void 
  * Allows adding, editing, and archiving (soft-delete) status definitions.
  */
 export function StatusEditor({ classId, statuses, onUpdate }: StatusEditorProps) {
+    const t = useTranslations("classSettings");
+
     // Filter active (non-archived) statuses and sort by order
     const activeStatuses = Object.values(statuses)
         .filter((s) => !s.isArchived)
@@ -529,11 +537,10 @@ export function StatusEditor({ classId, statuses, onUpdate }: StatusEditorProps)
         <div className="space-y-4">
             <div>
                 <Heading size="3" className="mb-2">
-                    Status Definitions
+                    {t("statusDefinitions")}
                 </Heading>
                 <Text size="3" color="olive">
-                    Define attendance statuses with custom colors, scoring multipliers, and absence
-                    weights.
+                    {t("statusDefinitionsDesc")}
                 </Text>
             </div>
 

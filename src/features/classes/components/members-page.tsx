@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 
 import { UserX } from "lucide-react";
@@ -33,19 +34,17 @@ import { memberApi } from "@/features/classes/api/memberApi";
 import { useEnrollments } from "@/features/classes/hooks/useEnrollments";
 import { useClassRole, useMembers } from "@/features/classes/hooks/useMembers";
 import { getInitials } from "@/lib/utils";
+import { useAuth } from "@/providers/auth-provider";
 
-import type { ClassRole, Enrollment } from "@/types";
+import type { ClassMember, ClassRole, Enrollment } from "@/types";
 
-// ─── Role Badge ───────────────────────────────────────────────────────────────
-
-/**
- * Displays a role badge with appropriate styling for teacher, TA, or student roles.
- */
+// Update RoleBadge
 function RoleBadge({ role }: { role: ClassRole }) {
+    const t = useTranslations("members");
     const roleConfig = {
-        teacher: { label: "Teacher", variant: "default" as const },
-        ta: { label: "TA", variant: "secondary" as const },
-        student: { label: "Student", variant: "outline" as const },
+        teacher: { label: t("teacher"), variant: "default" as const },
+        ta: { label: t("ta"), variant: "secondary" as const },
+        student: { label: t("student"), variant: "outline" as const },
     };
 
     const config = roleConfig[role];
@@ -57,24 +56,24 @@ function RoleBadge({ role }: { role: ClassRole }) {
     );
 }
 
-// ─── Role Selector ────────────────────────────────────────────────────────────
-
-/**
- * Dropdown for promoting/demoting a member's role.
- * Only visible to teachers.
- */
+// Update RoleSelector
 function RoleSelector({
     currentRole,
     userId,
     classId,
+    currentUserId,
     onRoleChange,
 }: {
     currentRole: ClassRole;
     userId: string;
     classId: string;
+    currentUserId: string | null;
     onRoleChange: () => void;
 }) {
+    const t = useTranslations("members");
     const [isChanging, setIsChanging] = useState(false);
+
+    const isSelf = userId === currentUserId;
 
     const handleRoleChange = useCallback(
         async (newRole: ClassRole) => {
@@ -83,7 +82,7 @@ function RoleSelector({
             setIsChanging(true);
             try {
                 await memberApi.setRole(classId, userId, newRole);
-                toast.success(`Role updated to ${newRole}`);
+                toast.success(t("roleUpdated", { role: newRole }));
                 onRoleChange();
             } catch (error) {
                 toast.error("Failed to update role");
@@ -92,105 +91,141 @@ function RoleSelector({
                 setIsChanging(false);
             }
         },
-        [classId, userId, currentRole, onRoleChange],
+        [classId, userId, currentRole, onRoleChange, t],
     );
 
     return (
         <Select
             value={currentRole}
             onValueChange={(value) => handleRoleChange(value as ClassRole)}
-            disabled={isChanging}
+            disabled={isChanging || isSelf}
         >
-            <SelectTrigger size="sm" className="w-28">
+            <SelectTrigger
+                size="sm"
+                className="w-28"
+                title={isSelf ? t("cannotChangeOwnRole") : undefined}
+            >
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="teacher">Teacher</SelectItem>
-                <SelectItem value="ta">TA</SelectItem>
-                <SelectItem value="student">Student</SelectItem>
+                <SelectItem value="teacher">{t("teacher")}</SelectItem>
+                <SelectItem value="ta">{t("ta")}</SelectItem>
+                <SelectItem value="student">{t("student")}</SelectItem>
             </SelectContent>
         </Select>
     );
 }
 
-// ─── Member Row ───────────────────────────────────────────────────────────────
-
+// Update MemberRow - now accepts member + optional enrollment
 function MemberRow({
+    member,
     enrollment,
-    role,
     currentUserRole,
+    currentUserId,
     classId,
     onRoleChange,
+    isLastTeacher,
 }: {
-    enrollment: Enrollment;
-    role: ClassRole;
+    member: ClassMember;
+    enrollment: Enrollment | null;
     currentUserRole: ClassRole | null;
+    currentUserId: string | null;
     classId: string;
     onRoleChange: () => void;
+    isLastTeacher: boolean;
 }) {
-    const handleRemove = useCallback(async () => {
-        try {
-            await enrollmentApi.deactivate(enrollment.id);
-            toast.success(`${enrollment.studentName} removed from class.`);
-        } catch {
-            toast.error("Failed to remove student.");
-        }
-    }, [enrollment]);
+    const t = useTranslations("members");
+    const tCommon = useTranslations("common");
 
     const attendanceRate =
-        enrollment.sessionsEligible > 0
+        enrollment && enrollment.sessionsEligible > 0
             ? Math.round((enrollment.sessionsAttended / enrollment.sessionsEligible) * 100)
             : null;
 
     const canManageRoles = currentUserRole === "teacher";
+
+    // Use member profile data first, fallback to enrollment data
+    const displayName = member.displayName || enrollment?.studentName || "Unknown Member";
+    const displayEmail = member.email || enrollment?.studentEmail || "";
+
+    // Prevent removing self if last teacher
+    const isSelf = member.userId === currentUserId;
+    const canRemove = canManageRoles && !(isSelf && isLastTeacher);
+
+    const handleRemove = useCallback(async () => {
+        try {
+            // Remove from members subcollection (works for all roles)
+            await memberApi.removeMember(classId, member.userId);
+
+            // Also deactivate enrollment if exists (for students)
+            if (enrollment) {
+                await enrollmentApi.deactivate(enrollment.id);
+            }
+
+            toast.success(`${displayName} removed.`);
+        } catch (error) {
+            toast.error("Failed to remove member.");
+            console.error("Remove member error:", error);
+        }
+    }, [classId, member.userId, enrollment, displayName]);
 
     return (
         <div className="group border-border/30 bg-ivory hover:ring-border/60 whisper-shadow animate-fade-in flex items-center justify-between gap-4 rounded-2xl border px-6 py-5 transition-all hover:ring-1">
             <div className="flex min-w-0 items-center gap-4">
                 <Avatar className="ring-border/40 h-12 w-12 shrink-0 rounded-2xl ring-1">
                     <AvatarFallback className="bg-background text-near-black font-serif text-sm font-semibold">
-                        {getInitials(enrollment.studentName)}
+                        {getInitials(displayName)}
                     </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
                         <Text size="4" weight="semibold" className="block truncate">
-                            {enrollment.studentName}
+                            {displayName}
+                            {isSelf && (
+                                <Text as="span" size="3" color="olive" className="ml-2">
+                                    ({t("you")})
+                                </Text>
+                            )}
                         </Text>
                         {canManageRoles ? (
                             <RoleSelector
-                                currentRole={role}
-                                userId={enrollment.studentId}
+                                currentRole={member.role}
+                                userId={member.userId}
                                 classId={classId}
+                                currentUserId={currentUserId}
                                 onRoleChange={onRoleChange}
                             />
                         ) : (
-                            <RoleBadge role={role} />
+                            <RoleBadge role={member.role} />
                         )}
                     </div>
-                    <Text size="2" color="olive" className="block truncate">
-                        {enrollment.studentEmail}
-                    </Text>
+                    {displayEmail && (
+                        <Text size="2" color="olive" className="block truncate">
+                            {displayEmail}
+                        </Text>
+                    )}
                 </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-6">
-                {/* Aggregated Score */}
-                <div className="hidden text-right sm:block">
-                    <Text
-                        size="1"
-                        weight="bold"
-                        color="stone"
-                        className="mb-1 block tracking-widest uppercase"
-                    >
-                        Score
-                    </Text>
-                    <Heading size="4" className="text-near-black">
-                        {enrollment.aggregatedScore ?? 0}
-                    </Heading>
-                </div>
+                {/* Aggregated Score - only for students with enrollment */}
+                {enrollment && (
+                    <div className="hidden text-right sm:block">
+                        <Text
+                            size="1"
+                            weight="bold"
+                            color="stone"
+                            className="mb-1 block tracking-widest uppercase"
+                        >
+                            {t("score")}
+                        </Text>
+                        <Heading size="4" className="text-near-black">
+                            {enrollment.aggregatedScore ?? 0}
+                        </Heading>
+                    </div>
+                )}
 
-                {/* Attendance Rate */}
+                {/* Attendance Rate - only for students with enrollment */}
                 {attendanceRate !== null && (
                     <div className="hidden text-right sm:block">
                         <Text
@@ -199,7 +234,7 @@ function MemberRow({
                             color="stone"
                             className="mb-1 block tracking-widest uppercase"
                         >
-                            Rate
+                            {t("rate")}
                         </Text>
                         <Heading
                             size="4"
@@ -216,66 +251,94 @@ function MemberRow({
                     </div>
                 )}
 
-                {/* Remove Button */}
-                <AlertDialog>
-                    <AlertDialogTrigger
-                        render={
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-stone-gray hover:text-terracotta hover:bg-terracotta/5 h-10 w-10 rounded-xl opacity-0 transition-all group-hover:opacity-100"
-                            >
-                                <UserX className="h-5 w-5" />
-                                <span className="sr-only">Remove student</span>
-                            </Button>
-                        }
-                    />
-                    <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-[32px] p-8">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Remove {enrollment.studentName}?</AlertDialogTitle>
-                            <AlertDialogDescription className="pt-2 leading-relaxed">
-                                This will remove them from the active class roster. Their historical
-                                attendance records will be preserved for archival purposes.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="pt-6">
-                            <AlertDialogCancel className="border-border/60 rounded-xl px-6 font-serif">
-                                Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={handleRemove}
-                                className="bg-terracotta hover:bg-terracotta/90 rounded-xl px-6 font-serif"
-                            >
-                                Remove student
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                {/* Remove Button - only for teachers, disabled if last teacher removing self */}
+                {canManageRoles && (
+                    <AlertDialog>
+                        <AlertDialogTrigger
+                            render={
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={!canRemove}
+                                    title={
+                                        !canRemove && isSelf && isLastTeacher
+                                            ? t("cannotRemoveLastTeacher")
+                                            : t("remove")
+                                    }
+                                    className="text-stone-gray hover:text-destructive hover:bg-destructive/5 h-10 w-10 rounded-xl opacity-0 transition-all group-hover:opacity-100 disabled:opacity-30"
+                                >
+                                    <UserX className="h-5 w-5" />
+                                    <span className="sr-only">{t("remove")}</span>
+                                </Button>
+                            }
+                        />
+                        <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-[32px] p-8">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    {t("removeConfirmTitle", { name: displayName })}
+                                </AlertDialogTitle>
+                                <AlertDialogDescription className="pt-2 leading-relaxed">
+                                    {t("removeConfirmDesc")}
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="pt-6">
+                                <AlertDialogCancel className="border-border/60 rounded-xl px-6 font-serif">
+                                    {tCommon("cancel")}
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={handleRemove}
+                                    variant="destructive"
+                                    className="rounded-xl px-6 font-serif"
+                                >
+                                    {t("remove")}
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
             </div>
         </div>
     );
 }
 
-// ─── Members Page ─────────────────────────────────────────────────────────────
-
+// Update MembersPage
 export function MembersPage({ classId }: { classId: string }) {
+    const t = useTranslations("members");
     const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(classId);
     const { members, isLoading: membersLoading } = useMembers(classId);
     const currentUserRole = useClassRole(classId);
+    const { user } = useAuth();
 
     const isLoading = enrollmentsLoading || membersLoading;
 
-    // Build a map of userId -> role for quick lookup
-    const roleMap = new Map<string, ClassRole>();
-    members.forEach((member) => {
-        roleMap.set(member.userId, member.role);
+    // Build a map of userId -> enrollment for quick lookup
+    const enrollmentMap = new Map<string, Enrollment>();
+    enrollments.forEach((enrollment) => {
+        enrollmentMap.set(enrollment.studentId, enrollment);
     });
 
-    // Merge enrollments with roles (default to "student" if not found in members)
-    const membersWithRoles = enrollments.map((enrollment) => ({
-        enrollment,
-        role: roleMap.get(enrollment.studentId) ?? "student",
+    // FIXED: Iterate over MEMBERS (not enrollments) to show ALL roles
+    // Left join with enrollments for analytics data (students only)
+    const membersWithData = members.map((member) => ({
+        member,
+        enrollment: enrollmentMap.get(member.userId) ?? null,
     }));
+
+    // Sort by role priority: teacher > ta > student, then alphabetically
+    const sortedMembers = membersWithData.sort((a, b) => {
+        const rolePriority = { teacher: 0, ta: 1, student: 2 };
+        const priorityDiff = rolePriority[a.member.role] - rolePriority[b.member.role];
+        if (priorityDiff !== 0) return priorityDiff;
+
+        // Same role - sort alphabetically by display name
+        const nameA = a.member.displayName || a.enrollment?.studentName || "Unknown";
+        const nameB = b.member.displayName || b.enrollment?.studentName || "Unknown";
+        return nameA.localeCompare(nameB);
+    });
+
+    // Count teachers to prevent removing last one
+    const teacherCount = members.filter((m) => m.role === "teacher").length;
+    const isLastTeacher = teacherCount === 1;
 
     if (isLoading) {
         return (
@@ -287,11 +350,11 @@ export function MembersPage({ classId }: { classId: string }) {
         );
     }
 
-    if (enrollments.length === 0) {
+    if (members.length === 0) {
         return (
             <div className="bg-ivory/50 border-border/40 flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-8 text-center">
                 <Text size="4" color="stone" className="max-w-xs">
-                    No students enrolled yet. Share the class join code to get started.
+                    {t("noMembers")}
                 </Text>
             </div>
         );
@@ -301,18 +364,19 @@ export function MembersPage({ classId }: { classId: string }) {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <Heading size="2" color="stone" className="uppercase">
-                    {enrollments.length} {enrollments.length === 1 ? "student" : "students"}{" "}
-                    enrolled
+                    {t("enrolledCount", { count: members.length })}
                 </Heading>
             </div>
             <div className="flex flex-col gap-3">
-                {membersWithRoles.map(({ enrollment, role }) => (
+                {sortedMembers.map(({ member, enrollment }) => (
                     <MemberRow
-                        key={enrollment.id}
+                        key={member.userId}
+                        member={member}
                         enrollment={enrollment}
-                        role={role}
                         currentUserRole={currentUserRole}
+                        currentUserId={user?.uid ?? null}
                         classId={classId}
+                        isLastTeacher={isLastTeacher}
                         onRoleChange={() => {
                             // Trigger re-fetch by React Query
                         }}

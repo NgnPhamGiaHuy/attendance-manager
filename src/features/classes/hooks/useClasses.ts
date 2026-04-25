@@ -27,6 +27,18 @@ export function useClasses() {
     });
 }
 
+export function useArchivedClasses() {
+    const { user } = useAuth();
+
+    return useSuspenseQuery({
+        queryKey: [...classKeys.lists(), "archived", user?.uid ?? ""],
+        queryFn: () => {
+            if (!user?.uid) return Promise.resolve([]);
+            return classApi.getArchivedClassesByUserId(user.uid);
+        },
+    });
+}
+
 export function useClass(id: string) {
     const queryClient = useQueryClient();
 
@@ -60,7 +72,7 @@ export function useCreateClass() {
     return useMutation({
         mutationFn: (data: { name: string; description?: string }) => {
             if (!user) throw new Error("Must be logged in to create a class.");
-            return classApi.createClass(data, user.uid, user.displayName);
+            return classApi.createClass(data, user.uid, user.displayName, user.email);
         },
         onSuccess: () => {
             // Invalidate classes list so it refetches and shows the new class
@@ -92,6 +104,50 @@ export function useUpdateClass() {
             classApi.updateClass(id, data),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: classKeys.detail(variables.id) });
+            queryClient.invalidateQueries({ queryKey: classKeys.lists() });
+        },
+    });
+}
+
+export function useDeleteClass() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (classId: string) => classApi.deleteClass(classId),
+        onSuccess: () => {
+            // Invalidate classes list so deleted class disappears
+            queryClient.invalidateQueries({ queryKey: classKeys.lists() });
+        },
+    });
+}
+
+export function useArchiveClass() {
+    const queryClient = useQueryClient();
+    const { user } = useAuth();
+
+    return useMutation({
+        mutationFn: (classId: string) => {
+            if (!user) throw new Error("Must be logged in to archive a class.");
+            return classApi.archiveForUser(classId, user.uid);
+        },
+        onSuccess: () => {
+            // Invalidate classes list so archived class disappears from dashboard
+            queryClient.invalidateQueries({ queryKey: classKeys.lists() });
+        },
+    });
+}
+
+export function useUnarchiveClass() {
+    const queryClient = useQueryClient();
+    const { user } = useAuth();
+
+    return useMutation({
+        mutationFn: (classId: string) => {
+            if (!user) throw new Error("Must be logged in to unarchive a class.");
+            return classApi.unarchiveForUser(classId, user.uid);
+        },
+        onSuccess: () => {
+            // Invalidate classes list so unarchived class reappears
             queryClient.invalidateQueries({ queryKey: classKeys.lists() });
         },
     });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { WifiOff } from "lucide-react";
@@ -13,6 +14,7 @@ import { Text } from "@/components/ui/typography";
  * Subscribes to browser online/offline events and shows a message at the top of the page.
  */
 export function OfflineBanner() {
+    const t = useTranslations("common");
     const [isOffline, setIsOffline] = useState(false);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export function OfflineBanner() {
         <div className="animate-fade-in fixed top-0 right-0 left-0 z-50 flex items-center justify-center gap-3 bg-amber-500 px-4 py-3 text-white shadow-md">
             <WifiOff className="h-5 w-5" />
             <Text size="3" weight="medium" className="text-white">
-                You&apos;re offline — changes will sync when connectivity is restored.
+                {t("offline")}
             </Text>
         </div>
     );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -27,6 +28,7 @@ function RecordsMatrix({
     enrollments: { studentId: string; studentName: string }[];
     classData: { statusDefinitions: Record<string, StatusDefinition> };
 }) {
+    const t = useTranslations("records");
     const [records, setRecords] = useState<AttendanceRecord[]>([]);
 
     useEffect(() => {
@@ -53,8 +55,7 @@ function RecordsMatrix({
         return (
             <div className="bg-ivory/50 border-border/40 whisper-shadow animate-fade-in flex h-64 flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
                 <Text size="4" color="stone" className="max-w-md leading-relaxed">
-                    No finalized sessions found. Finalize an active session from the Overview tab to
-                    generate historical records in this matrix.
+                    {t("noFinalizedSessions")}
                 </Text>
             </div>
         );
@@ -74,7 +75,7 @@ function RecordsMatrix({
                                         color="stone"
                                         className="tracking-widest uppercase"
                                     >
-                                        Student Name
+                                        {t("studentName")}
                                     </Text>
                                 </th>
                                 {sessions.map((s, idx) => (
@@ -164,11 +165,12 @@ function RecordsMatrix({
 // ─── Records Page ─────────────────────────────────────────────────────────────
 
 export function RecordsPage({ classId }: { classId: string }) {
+    const t = useTranslations("records");
     const { data: classData } = useClass(classId);
     const { sessions, isLoading: sessionsLoading } = useClassSessions(classId);
     const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(classId);
 
-    const finalizedSessions = sessions.filter((s) => s.isFinalized);
+    const finalizedSessions = useMemo(() => sessions.filter((s) => s.isFinalized), [sessions]);
 
     // Separate active and inactive enrollments
     const activeEnrollments = useMemo(() => enrollments.filter((e) => e.isActive), [enrollments]);
@@ -178,7 +180,7 @@ export function RecordsPage({ classId }: { classId: string }) {
         [enrollments],
     );
 
-    if (sessionsLoading || enrollmentsLoading) {
+    if (sessionsLoading || enrollmentsLoading || !classData) {
         return (
             <div className="space-y-6">
                 <Skeleton className="h-6 w-48 rounded-lg" />
@@ -193,8 +195,8 @@ export function RecordsPage({ classId }: { classId: string }) {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <Heading size="2" color="stone" className="uppercase">
-                        {finalizedSessions.length} finalized sessions · {activeEnrollments.length}{" "}
-                        active students
+                        {t("finalizedSessions", { count: finalizedSessions.length })} ·{" "}
+                        {t("activeStudents", { count: activeEnrollments.length })}
                     </Heading>
                 </div>
                 <RecordsMatrix
@@ -211,13 +213,12 @@ export function RecordsPage({ classId }: { classId: string }) {
                     <div className="flex items-center gap-3">
                         <div className="bg-stone-gray/20 h-px flex-1" />
                         <Heading size="3" color="stone" className="uppercase">
-                            Inactive Members ({inactiveEnrollments.length})
+                            {t("inactiveMembers", { count: inactiveEnrollments.length })}
                         </Heading>
                         <div className="bg-stone-gray/20 h-px flex-1" />
                     </div>
                     <Text size="2" color="stone" className="text-center italic">
-                        These students have been deactivated but their historical records are
-                        preserved.
+                        {t("inactiveDesc")}
                     </Text>
                     <RecordsMatrix
                         classId={classId}

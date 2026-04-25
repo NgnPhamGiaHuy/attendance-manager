@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Suspense } from "react";
 
 import { ArrowLeft, Play } from "lucide-react";
@@ -10,6 +9,8 @@ import { AppShell, PageContainer } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Heading, Text } from "@/components/ui/typography";
 import { useClass } from "@/features/classes/hooks/useClasses";
+import { usePermissions } from "@/features/classes/hooks/usePermissions";
+import { Link, usePathname } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
 interface ClassLayoutProps {
@@ -20,18 +21,27 @@ interface ClassLayoutProps {
 function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
     const { data: classItem } = useClass(classId);
     const pathname = usePathname();
+    const t = useTranslations("classes");
+    const tCommon = useTranslations("common");
 
-    let activeTab = "overview";
-    if (pathname.includes("/records")) activeTab = "records";
-    if (pathname.includes("/members")) activeTab = "members";
-    if (pathname.includes("/settings")) activeTab = "settings";
+    const activeTab =
+        ["records", "members", "settings"].find((tab) => pathname.includes(`/${tab}`)) ||
+        "overview";
+
+    const permissions = usePermissions(classId);
 
     const tabs = [
-        { id: "overview", label: "Overview", href: `/classes/${classId}` },
-        { id: "records", label: "Records", href: `/classes/${classId}/records` },
-        { id: "members", label: "Members", href: `/classes/${classId}/members` },
-        { id: "settings", label: "Settings", href: `/classes/${classId}/settings` },
-    ];
+        { id: "overview", label: t("overview"), href: `/classes/${classId}` },
+        { id: "records", label: t("records"), href: `/classes/${classId}/records` },
+        {
+            id: "members",
+            label: t("members_tab", { fallback: "Members" }),
+            href: `/classes/${classId}/members`,
+        },
+        { id: "settings", label: t("settings"), href: `/classes/${classId}/settings` },
+    ].filter(
+        (tab) => tab.id !== "settings" || permissions.isLoading || permissions.canManageSettings,
+    );
 
     return (
         <AppShell title={classItem.name}>
@@ -43,7 +53,7 @@ function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
                             className="text-stone-gray hover:text-near-black inline-flex w-fit items-center text-[10px] font-bold tracking-widest uppercase transition-colors"
                         >
                             <ArrowLeft className="mr-2 h-3.5 w-3.5" />
-                            Back to Dashboard
+                            {tCommon("backToDashboard")}
                         </Link>
 
                         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
@@ -52,12 +62,13 @@ function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
                                     {classItem.name}
                                 </Heading>
                                 <Text size="4" color="olive" className="max-w-xl">
-                                    {classItem.description || `Class Code: ${classItem.code}`}
+                                    {classItem.description ||
+                                        t("classCode", { code: classItem.code })}
                                 </Text>
                             </div>
                             <Button className="whisper-shadow h-12 rounded-2xl px-8 font-serif text-base">
                                 <Play className="mr-2.5 h-4 w-4 fill-current" />
-                                Start Attendance
+                                {t("startAttendance")}
                             </Button>
                         </div>
                     </div>
@@ -93,8 +104,9 @@ function ClassLayoutContent({ classId, children }: ClassLayoutProps) {
 }
 
 function ClassLayoutSkeleton() {
+    const t = useTranslations("classes");
     return (
-        <AppShell title="Loading Class...">
+        <AppShell title={t("loadingClass")}>
             <PageContainer>
                 <div className="flex animate-pulse flex-col gap-10">
                     <div className="bg-ivory ring-border/40 h-4 w-32 rounded ring-1" />

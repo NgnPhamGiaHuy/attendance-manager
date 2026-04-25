@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { CheckSquare, X } from "lucide-react";
@@ -39,6 +40,7 @@ export function BulkActionToolbar({
     onSelectAll,
     onDeselectAll,
 }: BulkActionToolbarProps) {
+    const t = useTranslations("sessions");
     const [selectedStatusId, setSelectedStatusId] = useState<string>("");
     const [isApplying, setIsApplying] = useState(false);
 
@@ -65,7 +67,7 @@ export function BulkActionToolbar({
             <div className="flex items-center gap-2">
                 <CheckSquare className="text-terracotta h-5 w-5" />
                 <Text size="3" weight="semibold">
-                    {selectedIds.size} {selectedIds.size === 1 ? "student" : "students"} selected
+                    {t("bulkSelected", { count: selectedIds.size })}
                 </Text>
             </div>
 
@@ -75,7 +77,7 @@ export function BulkActionToolbar({
                 onValueChange={(value) => setSelectedStatusId(value ?? "")}
             >
                 <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Select status..." />
+                    <SelectValue placeholder={t("selectStatus")} />
                 </SelectTrigger>
                 <SelectContent>
                     {activeStatuses.map((status) => (
@@ -98,18 +100,18 @@ export function BulkActionToolbar({
                 disabled={isApplyDisabled}
                 className="bg-terracotta hover:bg-terracotta/90"
             >
-                {isApplying ? "Applying..." : "Apply"}
+                {isApplying ? t("applying") : t("apply")}
             </Button>
 
             {/* Deselect All Button */}
             <Button variant="ghost" onClick={onDeselectAll} className="ml-auto">
                 <X className="mr-2 h-4 w-4" />
-                Deselect All
+                {t("deselectAll")}
             </Button>
 
             {/* Select All Button */}
             <Button variant="outline" onClick={onSelectAll}>
-                Select All
+                {t("selectAll")}
             </Button>
         </div>
     );

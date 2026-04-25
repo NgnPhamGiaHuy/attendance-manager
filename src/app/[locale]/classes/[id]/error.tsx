@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Heading, Text } from "@/components/ui/typography";
+import { Link } from "@/i18n/routing";
 
 export default function ClassError({
     error,
@@ -16,6 +17,8 @@ export default function ClassError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const t = useTranslations("errors");
+    const tCommon = useTranslations("common");
     useEffect(() => {
         console.error("[ClassError]", error);
     }, [error]);
@@ -38,12 +41,10 @@ export default function ClassError({
                         as="h1"
                         className="text-near-black text-center font-serif tracking-tight"
                     >
-                        {isNotFound ? "Class not found" : "Something went wrong"}
+                        {isNotFound ? t("classNotFound") : t("somethingWentWrong")}
                     </Heading>
                     <Text size="5" color="olive" className="text-center leading-relaxed">
-                        {isNotFound
-                            ? "This class doesn't exist or you don't have access to it. It might have been archived or moved."
-                            : "An unexpected error occurred while loading this class. We've been notified and are looking into it."}
+                        {isNotFound ? t("classNotFoundDesc") : t("somethingWentWrong")}
                     </Text>
                 </div>
 
@@ -55,7 +56,7 @@ export default function ClassError({
                     >
                         <Link href="/dashboard">
                             <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                            Back to Dashboard
+                            {tCommon("backToDashboard")}
                         </Link>
                     </Button>
 
@@ -64,7 +65,7 @@ export default function ClassError({
                             onClick={reset}
                             className="h-14 rounded-2xl px-10 text-base font-semibold"
                         >
-                            Try again
+                            {tCommon("tryAgain")}
                         </Button>
                     )}
                 </div>

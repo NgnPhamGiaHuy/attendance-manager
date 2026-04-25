@@ -1,14 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Heading, Text } from "@/components/ui/typography";
+import { Link } from "@/i18n/routing";
 
 export default function NotFound() {
+    const t = useTranslations("errors");
+    const tCommon = useTranslations("common");
     return (
         <div className="bg-background flex min-h-screen flex-col items-center justify-center px-4 text-center">
             <motion.div
@@ -35,15 +38,14 @@ export default function NotFound() {
                         as="h1"
                         className="text-near-black text-center font-serif tracking-tight"
                     >
-                        Lost in thought
+                        {t("lostInThought")}
                     </Heading>
                     <Text
                         size="5"
                         color="olive"
                         className="mx-auto max-w-md text-center text-lg leading-relaxed"
                     >
-                        The page you're looking for has drifted beyond the horizon. Let's guide you
-                        back to familiar grounds.
+                        {t("pageDrifted")}
                     </Text>
                 </div>
 
@@ -60,7 +62,7 @@ export default function NotFound() {
                     >
                         <Link href="/dashboard">
                             <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                            Back to Dashboard
+                            {tCommon("backToDashboard")}
                         </Link>
                     </Button>
                 </motion.div>
@@ -77,7 +79,7 @@ export default function NotFound() {
                         color="stone"
                         className="block text-center font-medium tracking-[0.2em] uppercase"
                     >
-                        Attendance Manager
+                        {tCommon("appName")}
                     </Text>
                 </motion.div>
             </motion.div>

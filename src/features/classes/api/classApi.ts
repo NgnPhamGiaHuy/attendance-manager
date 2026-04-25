@@ -1,6 +1,7 @@
 import {
+    collectionGroup,
+    deleteDoc,
     doc,
-    documentId,
     getDoc,
     getDocs,
     increment,
@@ -13,62 +14,125 @@ import {
 } from "firebase/firestore";
 
 import { Collections } from "@/lib/collections";
+import { db } from "@/lib/firebase";
 import { generateClassCode } from "@/lib/utils";
 import { Class, DEFAULT_STATUSES, ScoringRules, StatusDefinition } from "@/types";
 
 export const classApi = {
     /**
-     * Fetch all classes owned by the user or where they are enrolled.
+     * Fetch all classes owned by the user or where they are a member.
+     * Uses both ownership and the members subcollection as sources of truth.
+     * Filters out classes archived by the user (isArchivedForUser flag).
      */
     getClassesByUserId: async (userId: string): Promise<Class[]> => {
-        // 1. Fetch owned classes
-        const ownedQuery = query(
-            Collections.classes(),
-            where("ownerId", "==", userId),
-            where("isArchived", "==", false),
-        );
-        const ownedSnapshot = await getDocs(ownedQuery);
-        const ownedClasses = ownedSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-        })) as Class[];
+        const allClasses: Class[] = [];
+        const seenClassIds = new Set<string>();
 
-        // 2. Fetch enrollments to find joined classes
-        const enrollmentQuery = query(
-            Collections.enrollments(),
-            where("studentId", "==", userId),
-            where("isActive", "==", true),
-        );
-        const enrollmentSnapshot = await getDocs(enrollmentQuery);
-        const enrolledClassIds = enrollmentSnapshot.docs.map((doc) => doc.data().classId);
-
-        // Filter out classes we already have as owner
-        const joinedClassIds = enrolledClassIds.filter(
-            (id) => !ownedClasses.some((c) => c.id === id),
-        );
-
-        if (joinedClassIds.length === 0) {
-            return ownedClasses;
-        }
-
-        // 3. Fetch joined class details using an 'in' query for efficiency
-        const joinedClasses: Class[] = [];
-        if (joinedClassIds.length > 0) {
-            // Note: Firebase 'in' queries are limited to 30 items
-            // For most users this is fine; for power users we'd need to chunk
-            const joinedQuery = query(
+        try {
+            // 1. Fetch owned classes
+            const ownedQuery = query(
                 Collections.classes(),
-                where(documentId(), "in", joinedClassIds.slice(0, 30)),
+                where("ownerId", "==", userId),
+                where("isArchived", "==", false),
             );
-            const joinedSnapshot = await getDocs(joinedQuery);
-            joinedClasses.push(
-                ...joinedSnapshot.docs
-                    .map((d) => ({ ...d.data(), id: d.id }) as Class)
-                    .filter((c) => !c.isArchived),
-            );
+            const ownedSnapshot = await getDocs(ownedQuery);
+
+            for (const doc of ownedSnapshot.docs) {
+                const classData = { ...doc.data(), id: doc.id } as Class;
+                allClasses.push(classData);
+                seenClassIds.add(doc.id);
+            }
+        } catch (error) {
+            console.error("Error fetching owned classes:", error);
         }
 
-        return [...ownedClasses, ...joinedClasses];
+        try {
+            // 2. Use collection group query to find all member documents for this user
+            // This queries across ALL classes/{classId}/members subcollections
+            const membersQuery = query(
+                collectionGroup(db, "members"),
+                where("userId", "==", userId),
+            );
+            const membersSnapshot = await getDocs(membersQuery);
+
+            // 3. Extract class IDs from member document paths, filtering out user-archived classes
+            const memberClassIds = membersSnapshot.docs
+                .filter((doc) => {
+                    const memberData = doc.data();
+                    // Filter out classes archived by this user
+                    return !memberData.isArchivedForUser;
+                })
+                .map((doc) => {
+                    // Path format: classes/{classId}/members/{userId}
+                    const pathParts = doc.ref.path.split("/");
+                    return pathParts[1]; // classId is at index 1
+                })
+                .filter((id) => !seenClassIds.has(id)); // Skip classes we already have
+
+            // 4. Fetch class details for each membership
+            for (const classId of memberClassIds) {
+                try {
+                    const classDoc = await getDoc(doc(Collections.classes(), classId));
+                    if (classDoc.exists()) {
+                        const classData = { ...classDoc.data(), id: classDoc.id } as Class;
+                        if (!classData.isArchived) {
+                            allClasses.push(classData);
+                            seenClassIds.add(classId);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Cannot read class ${classId}:`, error);
+                    continue;
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching member classes:", error);
+        }
+
+        return allClasses;
+    },
+
+    /**
+     * Fetch all archived classes for the user.
+     * Returns classes where isArchivedForUser flag is set.
+     */
+    getArchivedClassesByUserId: async (userId: string): Promise<Class[]> => {
+        const archivedClasses: Class[] = [];
+
+        try {
+            // Use collection group query to find all member documents for this user
+            const membersQuery = query(
+                collectionGroup(db, "members"),
+                where("userId", "==", userId),
+                where("isArchivedForUser", "==", true),
+            );
+            const membersSnapshot = await getDocs(membersQuery);
+
+            // Extract class IDs from member document paths
+            const archivedClassIds = membersSnapshot.docs.map((doc) => {
+                const pathParts = doc.ref.path.split("/");
+                return pathParts[1]; // classId is at index 1
+            });
+
+            // Fetch class details for each archived membership
+            for (const classId of archivedClassIds) {
+                try {
+                    const classDoc = await getDoc(doc(Collections.classes(), classId));
+                    if (classDoc.exists()) {
+                        const classData = { ...classDoc.data(), id: classDoc.id } as Class;
+                        // Include even if class itself is archived (isArchived flag)
+                        archivedClasses.push(classData);
+                    }
+                } catch (error) {
+                    console.warn(`Cannot read archived class ${classId}:`, error);
+                    continue;
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching archived classes:", error);
+        }
+
+        return archivedClasses;
     },
 
     /**
@@ -106,6 +170,7 @@ export const classApi = {
         data: { name: string; description?: string },
         ownerId: string,
         ownerName: string,
+        ownerEmail?: string,
     ): Promise<string> => {
         const classRef = doc(Collections.classes());
 
@@ -142,11 +207,13 @@ export const classApi = {
         // Create the class document
         await setDoc(classRef, newClass);
 
-        // Add the owner to the classMembers subcollection
+        // Add the owner to the classMembers subcollection with profile data
         const memberRef = doc(Collections.classMembers(classRef.id), ownerId);
         await setDoc(memberRef, {
             userId: ownerId,
             role: "teacher",
+            displayName: ownerName,
+            email: ownerEmail,
             addedAt: serverTimestamp(),
         });
 
@@ -173,17 +240,21 @@ export const classApi = {
         const classDoc = snapshot.docs[0];
         const classId = classDoc.id;
 
-        // Check if already enrolled
+        // Check if already a member
         const memberRef = doc(Collections.classMembers(classId), studentId);
         const memberSnap = await getDoc(memberRef);
+
         if (memberSnap.exists()) {
-            throw new Error("You are already enrolled in this class.");
+            // Already a member - just return classId
+            return classId;
         }
 
-        // Add to classMembers (RBAC subcollection)
+        // Add to classMembers (RBAC subcollection) with profile data
         await setDoc(memberRef, {
             userId: studentId,
             role: "student",
+            displayName: studentName,
+            email: studentEmail,
             addedAt: serverTimestamp(),
         });
 
@@ -450,5 +521,92 @@ export const classApi = {
             scoringRules: rules,
             updatedAt: serverTimestamp(),
         });
+    },
+
+    /**
+     * Delete a class permanently (development only).
+     * WARNING: This deletes all class data including members, sessions, and attendance records.
+     *
+     * @throws Error if class not found
+     *
+     * @example
+     * await classApi.deleteClass(classId);
+     */
+    deleteClass: async (classId: string): Promise<void> => {
+        const classRef = doc(Collections.classes(), classId);
+
+        // Delete the class document
+        // Note: Firestore security rules should handle permission checks
+        // Subcollections (members) are NOT automatically deleted - handle in Cloud Functions if needed
+        await deleteDoc(classRef);
+    },
+
+    /**
+     * Archive a class for the current user (user-specific soft-hide).
+     * Sets isArchivedForUser flag in the user's member document.
+     * The class remains visible to other members.
+     *
+     * @param classId - The class document ID
+     * @param userId - The user ID who is archiving
+     * @throws Error if member not found or update fails
+     *
+     * @example
+     * await classApi.archiveForUser(classId, userId);
+     */
+    archiveForUser: async (classId: string, userId: string): Promise<void> => {
+        try {
+            const memberRef = doc(Collections.classMembers(classId), userId);
+
+            // Check if member exists
+            const memberSnap = await getDoc(memberRef);
+            if (!memberSnap.exists()) {
+                throw new Error("You are not a member of this class");
+            }
+
+            // Set user-specific archive flag
+            await updateDoc(memberRef, {
+                isArchivedForUser: true,
+            });
+        } catch (error) {
+            console.error("[classApi.archiveForUser] Failed to archive class:", error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to archive class");
+        }
+    },
+
+    /**
+     * Unarchive a class for the current user.
+     * Removes isArchivedForUser flag from the user's member document.
+     *
+     * @param classId - The class document ID
+     * @param userId - The user ID who is unarchiving
+     * @throws Error if member not found or update fails
+     *
+     * @example
+     * await classApi.unarchiveForUser(classId, userId);
+     */
+    unarchiveForUser: async (classId: string, userId: string): Promise<void> => {
+        try {
+            const memberRef = doc(Collections.classMembers(classId), userId);
+
+            // Check if member exists
+            const memberSnap = await getDoc(memberRef);
+            if (!memberSnap.exists()) {
+                throw new Error("You are not a member of this class");
+            }
+
+            // Remove user-specific archive flag
+            await updateDoc(memberRef, {
+                isArchivedForUser: false,
+            });
+        } catch (error) {
+            console.error("[classApi.unarchiveForUser] Failed to unarchive class:", error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to unarchive class");
+        }
     },
 };

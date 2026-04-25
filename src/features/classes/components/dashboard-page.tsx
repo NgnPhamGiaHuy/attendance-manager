@@ -1,18 +1,42 @@
 "use client";
 
-import { Suspense } from "react";
+import { useTranslations } from "next-intl";
+import { Suspense, useState } from "react";
+
+import { Archive } from "lucide-react";
 
 import { PageContainer, PageHeader } from "@/components/layout/app-shell";
+import { Button } from "@/components/ui/button";
 import { Heading, Text } from "@/components/ui/typography";
 import { ClassCard } from "@/features/classes/components/class-card";
 import { CreateClassSheet } from "@/features/classes/components/create-class-sheet";
 import { JoinClassDialog } from "@/features/classes/components/join-class-dialog";
-import { useClasses } from "@/features/classes/hooks/useClasses";
+import { useArchivedClasses, useClasses } from "@/features/classes/hooks/useClasses";
 
-function DashboardContent() {
+function DashboardContent({ showArchived }: { showArchived: boolean }) {
     const { data: classes } = useClasses();
+    const { data: archivedClasses } = useArchivedClasses();
+    const t = useTranslations("classes");
 
-    if (!classes || classes.length === 0) {
+    const displayClasses = showArchived ? archivedClasses : classes;
+
+    if (!displayClasses || displayClasses.length === 0) {
+        if (showArchived) {
+            return (
+                <div className="border-border/30 bg-ivory animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
+                    <div className="bg-background ring-border/20 mb-8 flex h-24 w-24 items-center justify-center rounded-3xl ring-1">
+                        <Archive className="text-stone-gray h-10 w-10 opacity-30" />
+                    </div>
+                    <Heading size="6" as="h3" className="mb-3">
+                        {t("noArchivedClasses")}
+                    </Heading>
+                    <Text size="5" color="olive" className="max-w-sm leading-relaxed" as="p">
+                        {t("noArchivedClassesDesc")}
+                    </Text>
+                </div>
+            );
+        }
+
         return (
             <div className="border-border/30 bg-ivory animate-fade-in whisper-shadow flex min-h-[440px] flex-col items-center justify-center rounded-[32px] border border-dashed p-12 text-center">
                 <div className="bg-background ring-border/20 mb-8 flex h-24 w-24 items-center justify-center rounded-3xl ring-1">
@@ -21,11 +45,10 @@ function DashboardContent() {
                     </span>
                 </div>
                 <Heading size="6" as="h3" className="mb-3">
-                    No classes yet
+                    {t("noClasses")}
                 </Heading>
                 <Text size="5" color="olive" className="mb-10 max-w-sm leading-relaxed" as="p">
-                    Ready to start? Create your first class or join an existing one to begin taking
-                    attendance.
+                    {t("readyToStart")}
                 </Text>
                 <div className="flex items-center gap-4">
                     <JoinClassDialog />
@@ -37,8 +60,8 @@ function DashboardContent() {
 
     return (
         <div className="animate-fade-in grid grid-cols-1 gap-10 pb-12 md:grid-cols-2 lg:grid-cols-3">
-            {classes.map((c) => (
-                <ClassCard key={c.id} classItem={c} />
+            {displayClasses.map((c) => (
+                <ClassCard key={c.id} classItem={c} isArchived={showArchived} />
             ))}
         </div>
     );
@@ -58,22 +81,36 @@ function DashboardSkeleton() {
 }
 
 export function DashboardPage() {
+    const t = useTranslations("classes");
+    const [showArchived, setShowArchived] = useState(false);
+
     return (
         <PageContainer>
             <PageHeader
-                title="Your Classes"
-                description="The quietest way to manage attendance. Simple, thoughtful, and unhurried."
+                title={t("title")}
+                description={t("description")}
                 actions={
-                    <div className="hidden items-center gap-3 sm:flex">
-                        <JoinClassDialog />
-                        <CreateClassSheet />
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant={showArchived ? "secondary" : "ghost"}
+                            size="sm"
+                            onClick={() => setShowArchived(!showArchived)}
+                            className="rounded-xl font-serif"
+                        >
+                            <Archive className="mr-2 h-4 w-4" />
+                            {showArchived ? t("showActive") : t("showArchived")}
+                        </Button>
+                        <div className="hidden items-center gap-3 sm:flex">
+                            <JoinClassDialog />
+                            <CreateClassSheet />
+                        </div>
                     </div>
                 }
                 className="mb-12"
             />
 
             <Suspense fallback={<DashboardSkeleton />}>
-                <DashboardContent />
+                <DashboardContent showArchived={showArchived} />
             </Suspense>
         </PageContainer>
     );

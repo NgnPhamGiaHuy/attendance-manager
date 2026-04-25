@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 import { LogOut, Settings, User as UserIcon } from "lucide-react";
 
@@ -16,8 +15,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { Logo } from "@/components/ui/logo";
 import { Heading, Text } from "@/components/ui/typography";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { cn, getInitials } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -29,6 +30,8 @@ interface TopBarProps {
 
 export function TopBar({ title }: TopBarProps) {
     const { user } = useAuth();
+    const tAuth = useTranslations("auth");
+    const tCommon = useTranslations("common");
 
     return (
         <header className="border-border/40 bg-background/95 sticky top-0 z-10 flex h-16 items-center border-b px-6 backdrop-blur-sm">
@@ -49,84 +52,97 @@ export function TopBar({ title }: TopBarProps) {
                 )}
             </div>
 
-            {user && (
-                <DropdownMenu>
-                    <DropdownMenuTrigger
-                        render={(triggerProps) => (
-                            <Button
-                                {...triggerProps}
-                                variant="ghost"
-                                size="icon"
-                                className={cn(
-                                    "focus-visible:ring-terracotta/20 relative h-9 w-9 cursor-pointer rounded-full outline-none focus-visible:ring-2",
-                                    triggerProps.className,
+            <div className="flex items-center gap-2">
+                <LanguageSwitcher />
+                <div className="bg-border/40 mx-1 h-6 w-px" />
+                {user && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            render={(triggerProps) => (
+                                <Button
+                                    {...triggerProps}
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(
+                                        "focus-visible:ring-terracotta/20 relative h-9 w-9 cursor-pointer rounded-full outline-none focus-visible:ring-2",
+                                        triggerProps.className,
+                                    )}
+                                    aria-label={tAuth("account")}
+                                >
+                                    <Avatar className="ring-border/40 group-hover:whisper-shadow h-full w-full ring-1 transition-shadow">
+                                        <AvatarImage
+                                            src={user.photoURL ?? undefined}
+                                            alt={user.displayName}
+                                        />
+                                        <AvatarFallback className="bg-ivory text-near-black text-[10px] font-bold tracking-wider uppercase">
+                                            {getInitials(user.displayName)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            )}
+                        />
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{tAuth("account")}</DropdownMenuLabel>
+                            <div className="px-3 py-2 pb-3">
+                                <Text size="3" weight="semibold" className="block leading-none">
+                                    {user.displayName}
+                                </Text>
+                                <Text size="2" color="olive" className="mt-1 block truncate">
+                                    {user.email}
+                                </Text>
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                render={(itemProps) => (
+                                    <Link
+                                        {...itemProps}
+                                        href="/profile"
+                                        className={cn(
+                                            "flex w-full items-center",
+                                            itemProps.className,
+                                        )}
+                                    >
+                                        <UserIcon className="mr-2.5 h-4 w-4" />
+                                        {tCommon("profile")}
+                                    </Link>
                                 )}
-                                aria-label="User menu"
-                            >
-                                <Avatar className="ring-border/40 group-hover:whisper-shadow h-full w-full ring-1 transition-shadow">
-                                    <AvatarImage
-                                        src={user.photoURL ?? undefined}
-                                        alt={user.displayName}
-                                    />
-                                    <AvatarFallback className="bg-ivory text-near-black text-[10px] font-bold tracking-wider uppercase">
-                                        {getInitials(user.displayName)}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        )}
-                    />
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Account</DropdownMenuLabel>
-                        <div className="px-3 py-2 pb-3">
-                            <Text size="3" weight="semibold" className="block leading-none">
-                                {user.displayName}
-                            </Text>
-                            <Text size="2" color="olive" className="mt-1 block truncate">
-                                {user.email}
-                            </Text>
-                        </div>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            render={(itemProps) => (
-                                <Link
-                                    {...itemProps}
-                                    href="/profile"
-                                    className={cn("flex w-full items-center", itemProps.className)}
-                                >
-                                    <UserIcon className="mr-2.5 h-4 w-4" />
-                                    Profile
-                                </Link>
-                            )}
-                        />
-                        <DropdownMenuItem
-                            render={(itemProps) => (
-                                <Link
-                                    {...itemProps}
-                                    href="/settings"
-                                    className={cn("flex w-full items-center", itemProps.className)}
-                                >
-                                    <Settings className="mr-2.5 h-4 w-4" />
-                                    Settings
-                                </Link>
-                            )}
-                        />
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            variant="destructive"
-                            render={(itemProps) => (
-                                <Link
-                                    {...itemProps}
-                                    href="/logout"
-                                    className={cn("flex w-full items-center", itemProps.className)}
-                                >
-                                    <LogOut className="mr-2.5 h-4 w-4" />
-                                    Sign out
-                                </Link>
-                            )}
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )}
+                            />
+                            <DropdownMenuItem
+                                render={(itemProps) => (
+                                    <Link
+                                        {...itemProps}
+                                        href="/settings"
+                                        className={cn(
+                                            "flex w-full items-center",
+                                            itemProps.className,
+                                        )}
+                                    >
+                                        <Settings className="mr-2.5 h-4 w-4" />
+                                        {tCommon("settings")}
+                                    </Link>
+                                )}
+                            />
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                variant="destructive"
+                                render={(itemProps) => (
+                                    <Link
+                                        {...itemProps}
+                                        href="/logout"
+                                        className={cn(
+                                            "flex w-full items-center",
+                                            itemProps.className,
+                                        )}
+                                    >
+                                        <LogOut className="mr-2.5 h-4 w-4" />
+                                        {tAuth("signOut")}
+                                    </Link>
+                                )}
+                            />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+            </div>
         </header>
     );
 }

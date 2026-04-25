@@ -1,16 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Suspense, useEffect } from "react";
 
 import { Logo } from "@/components/ui/logo";
 import { Heading, Text } from "@/components/ui/typography";
 import { AuthForm } from "@/features/auth/components/auth-form";
+import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/providers/auth-provider";
 
 export function LoginPage() {
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
+    const t = useTranslations("auth");
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
@@ -26,10 +28,10 @@ export function LoginPage() {
                 <div className="w-full max-w-[380px] space-y-10">
                     <div className="space-y-4">
                         <Heading size="7" as="h1">
-                            Welcome back
+                            {t("welcomeBack")}
                         </Heading>
                         <Text size="4" color="olive" className="leading-relaxed" as="p">
-                            Sign in to continue managing your classes with thoughtful efficiency.
+                            {t("signInDesc")}
                         </Text>
                     </div>
 
@@ -49,12 +51,11 @@ export function LoginPage() {
                 <div className="relative z-10 max-w-lg space-y-8">
                     <div className="space-y-6">
                         <Heading size="8" color="default" className="text-ivory leading-[1.1]">
-                            &quot;The simplest way to manage your classroom presence.&quot;
+                            &quot;{t("quote")}&quot;
                         </Heading>
                         <div className="bg-terracotta h-px w-12" />
                         <Text size="5" color="stone" className="leading-relaxed" as="p">
-                            Exception-based attendance tracking designed for educators who value
-                            time and clarity.
+                            {t("quoteDesc")}
                         </Text>
                     </div>
 
@@ -67,7 +68,7 @@ export function LoginPage() {
                                 color="stone"
                                 className="tracking-widest uppercase"
                             >
-                                Trusted by 10,000+ educators
+                                {t("trustedBy")}
                             </Text>
                         </div>
                     </div>

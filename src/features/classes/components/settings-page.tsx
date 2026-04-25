@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/typography";
 import { ScoringRulesForm } from "@/features/classes/components/scoring-rules-form";
 import { StatusEditor } from "@/features/classes/components/status-editor";
-import { useClass, useUpdateClass } from "@/features/classes/hooks/useClasses";
+import { useClass, useDeleteClass, useUpdateClass } from "@/features/classes/hooks/useClasses";
 
 // ─── Details Form ─────────────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ function ClassDetailsForm({
     classId: string;
     initialData: z.infer<typeof detailsSchema>;
 }) {
+    const t = useTranslations("classSettings");
     const updateClass = useUpdateClass();
 
     const {
@@ -68,9 +70,9 @@ function ClassDetailsForm({
     const onSubmit = async (data: z.infer<typeof detailsSchema>) => {
         try {
             await updateClass.mutateAsync({ id: classId, data });
-            toast.success("Class details updated.");
+            toast.success(t("updateSuccess"));
         } catch {
-            toast.error("Failed to update class details.");
+            toast.error(t("updateFailed"));
         }
     };
 
@@ -78,10 +80,10 @@ function ClassDetailsForm({
         <Card className="border-border/40 bg-ivory whisper-shadow rounded-3xl">
             <CardHeader className="px-10 pt-10 pb-2">
                 <CardTitle size="6" className="font-serif">
-                    Class Details
+                    {t("classDetails")}
                 </CardTitle>
                 <CardDescription className="leading-relaxed">
-                    Update the name and description of this class.
+                    {t("classDetailsDesc")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="px-10 pt-6 pb-10">
@@ -91,7 +93,7 @@ function ClassDetailsForm({
                             htmlFor="name"
                             className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                         >
-                            Class Name
+                            {t("className")}
                         </Label>
                         <Input
                             id="name"
@@ -110,7 +112,7 @@ function ClassDetailsForm({
                             htmlFor="description"
                             className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                         >
-                            Description
+                            {t("description")}
                         </Label>
                         <Input
                             id="description"
@@ -132,7 +134,7 @@ function ClassDetailsForm({
                             color="stone"
                             className="tracking-widest uppercase"
                         >
-                            Session Timing
+                            {t("sessionTiming")}
                         </Text>
                         <div className="grid max-w-md grid-cols-2 gap-6">
                             <div className="space-y-3">
@@ -140,7 +142,7 @@ function ClassDetailsForm({
                                     htmlFor="defaultStartTime"
                                     className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
-                                    Default Start
+                                    {t("defaultStart")}
                                 </Label>
                                 <Input
                                     id="defaultStartTime"
@@ -160,7 +162,7 @@ function ClassDetailsForm({
                                     htmlFor="defaultEndTime"
                                     className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
-                                    Default End
+                                    {t("defaultEnd")}
                                 </Label>
                                 <Input
                                     id="defaultEndTime"
@@ -187,7 +189,7 @@ function ClassDetailsForm({
                         ) : (
                             <Save className="mr-2.5 h-4 w-4" />
                         )}
-                        Save Changes
+                        {t("saveChanges")}
                     </Button>
                 </form>
             </CardContent>
@@ -198,28 +200,28 @@ function ClassDetailsForm({
 // ─── Danger Zone ──────────────────────────────────────────────────────────────
 
 function DangerZone({ classId }: { classId: string }) {
-    const updateClass = useUpdateClass();
+    const t = useTranslations("classSettings");
+    const deleteClass = useDeleteClass();
 
-    const handleArchive = async () => {
+    const handleDelete = async () => {
         try {
-            await updateClass.mutateAsync({ id: classId, data: { isArchived: true } });
-            toast.success("Class archived.");
+            await deleteClass.mutateAsync(classId);
+            toast.success(t("deleteSuccess"));
             window.location.href = "/dashboard";
         } catch {
-            toast.error("Failed to archive class.");
+            toast.error(t("deleteFailed"));
         }
     };
 
     return (
-        <Card className="border-terracotta/20 bg-terracotta/[0.03] rounded-3xl">
+        <Card className="border-destructive/20 bg-destructive/[0.03] rounded-3xl">
             <CardHeader className="px-10 pt-10 pb-4">
-                <CardTitle size="6" className="text-terracotta flex items-center gap-3 font-serif">
+                <CardTitle size="6" className="text-destructive flex items-center gap-3 font-serif">
                     <AlertTriangle className="h-6 w-6" />
-                    Danger Zone
+                    {t("dangerZone")}
                 </CardTitle>
-                <CardDescription className="text-terracotta/70 leading-relaxed">
-                    Archiving a class will hide it from your dashboard but preserve all historical
-                    records and attendance data.
+                <CardDescription className="text-destructive/70 leading-relaxed">
+                    {t("deleteDesc")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="px-10 pt-2 pb-10">
@@ -228,31 +230,31 @@ function DangerZone({ classId }: { classId: string }) {
                         render={
                             <Button
                                 variant="destructive"
-                                className="bg-terracotta hover:bg-terracotta/90 h-11 rounded-xl px-8 font-serif text-base shadow-sm"
+                                className="h-11 rounded-xl px-8 font-serif text-base shadow-sm"
                             >
-                                Archive Class
+                                {t("deleteClass")}
                             </Button>
                         }
                     />
                     <AlertDialogContent className="border-border/40 bg-ivory whisper-shadow rounded-3xl p-8">
                         <AlertDialogHeader className="gap-2">
                             <AlertDialogTitle className="font-serif">
-                                Are you absolutely sure?
+                                {t("deleteConfirmTitle")}
                             </AlertDialogTitle>
                             <AlertDialogDescription className="leading-relaxed">
-                                This will archive the class. You can restore it later if needed, but
-                                it will be hidden from your active dashboard.
+                                {t("deleteConfirmDesc")}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className="mt-8 gap-3">
                             <AlertDialogCancel className="border-border/40 hover:bg-background/80 h-11 rounded-xl px-6 font-serif">
-                                Cancel
+                                {t("cancel")}
                             </AlertDialogCancel>
                             <AlertDialogAction
-                                onClick={handleArchive}
-                                className="bg-terracotta hover:bg-terracotta/90 h-11 rounded-xl px-8 font-serif text-base text-white shadow-sm"
+                                onClick={handleDelete}
+                                variant="destructive"
+                                className="h-11 rounded-xl px-8 font-serif text-base shadow-sm"
                             >
-                                Archive
+                                {t("deleteConfirm")}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

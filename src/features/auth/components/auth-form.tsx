@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { Loader2 } from "lucide-react";
@@ -9,9 +10,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link, useRouter } from "@/i18n/routing";
 import { useAuth } from "@/providers/auth-provider";
 
 export function AuthForm() {
+    const t = useTranslations("auth");
     const { signInWithGoogle, signInWithEmail } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -27,7 +30,7 @@ export function AuthForm() {
             router.push(redirectPath);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to sign in with Google.");
+            toast.error(t("googleError"));
         } finally {
             setIsGoogleLoading(false);
         }
@@ -41,7 +44,7 @@ export function AuthForm() {
             const password = formData.get("password") as string;
 
             if (!email || !password) {
-                toast.error("Please enter email and password.");
+                toast.error(t("missingFields"));
                 return;
             }
 
@@ -51,7 +54,7 @@ export function AuthForm() {
                 router.push(redirectPath);
             } catch (error) {
                 console.error(error);
-                toast.error("Invalid email or password.");
+                toast.error(t("invalidCredentials"));
             } finally {
                 setIsLoading(false);
             }
@@ -89,7 +92,7 @@ export function AuthForm() {
                             fill="#EA4335"
                         />
                     </svg>
-                    Continue with Google
+                    {t("continueWithGoogle")}
                 </Button>
 
                 <div className="relative my-2">
@@ -98,7 +101,7 @@ export function AuthForm() {
                     </div>
                     <div className="relative flex justify-center text-xs">
                         <span className="bg-background text-stone-gray px-4 text-[10px] font-medium tracking-widest uppercase">
-                            or use email
+                            {t("orUseEmail")}
                         </span>
                     </div>
                 </div>
@@ -109,7 +112,7 @@ export function AuthForm() {
                             htmlFor="email"
                             className="text-olive-gray ml-1 text-xs font-semibold tracking-wider uppercase"
                         >
-                            Email
+                            {t("emailAddress")}
                         </Label>
                         <Input
                             id="email"
@@ -127,7 +130,7 @@ export function AuthForm() {
                                 htmlFor="password"
                                 className="text-olive-gray ml-1 text-xs font-semibold tracking-wider uppercase"
                             >
-                                Password
+                                {t("password")}
                             </Label>
                         </div>
                         <Input
@@ -145,7 +148,7 @@ export function AuthForm() {
                         className="mt-2 h-12 w-full rounded-xl font-serif text-lg"
                     >
                         {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                        Sign In
+                        {t("signIn")}
                     </Button>
                 </form>
             </div>

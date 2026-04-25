@@ -1,59 +1,65 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Logo } from "@/components/ui/logo";
 import { Heading, Text } from "@/components/ui/typography";
 
 export function SiteFooter() {
+    const t = useTranslations("footer");
+
     return (
         <footer className="border-border/40 bg-ivory/50 border-t px-10 py-16 backdrop-blur-sm">
             <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-8 md:flex-row">
                 <div className="flex flex-col gap-4">
                     <Logo />
                     <Text size="2" color="stone" className="max-w-xs leading-relaxed">
-                        The only attendance platform designed for modern, human-centric classrooms.
+                        {t("tagline")}
                     </Text>
                 </div>
                 <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
                     <div className="flex flex-col gap-4">
                         <Text size="3" weight="bold" className="font-serif">
-                            Product
+                            {t("product")}
                         </Text>
                         <ul className="flex flex-col gap-2">
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Features
+                                {t("features")}
                             </li>
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Security
+                                {t("security")}
                             </li>
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Pricing
+                                {t("pricing")}
                             </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-4">
                         <Text size="3" weight="bold" className="font-serif">
-                            Company
+                            {t("company")}
                         </Text>
                         <ul className="flex flex-col gap-2">
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                About
+                                {t("about")}
                             </li>
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Blog
+                                {t("blog")}
                             </li>
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Careers
+                                {t("careers")}
                             </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-4">
                         <Text size="3" weight="bold" className="font-serif">
-                            Legal
+                            {t("legal")}
                         </Text>
                         <ul className="flex flex-col gap-2">
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Privacy
+                                {t("privacy")}
                             </li>
                             <li className="text-stone-gray hover:text-near-black cursor-pointer text-sm transition-colors">
-                                Terms
+                                {t("terms")}
                             </li>
                         </ul>
                     </div>
@@ -66,7 +72,7 @@ export function SiteFooter() {
                     color="stone"
                     className="tracking-widest uppercase opacity-60"
                 >
-                    &copy; {new Date().getFullYear()} Attendance Manager. All rights reserved.
+                    &copy; {new Date().getFullYear()} Attendance Manager. {t("rights")}
                 </Text>
             </div>
         </footer>

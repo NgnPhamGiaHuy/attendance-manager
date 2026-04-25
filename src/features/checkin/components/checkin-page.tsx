@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
@@ -18,43 +19,6 @@ interface CheckinPageProps {
     token: string;
 }
 
-// ─── Error Messages ───────────────────────────────────────────────────────────
-
-const ERROR_MESSAGES: Record<CheckinErrorCode, { title: string; message: string }> = {
-    [CheckinErrorCode.INVALID_TOKEN]: {
-        title: "Invalid QR Code",
-        message: "This QR code is invalid. Please scan the current code displayed by your teacher.",
-    },
-    [CheckinErrorCode.EXPIRED_TOKEN]: {
-        title: "QR Code Expired",
-        message: "This QR code has expired. Please ask your teacher to refresh it and scan again.",
-    },
-    [CheckinErrorCode.SESSION_NOT_ACTIVE]: {
-        title: "Session Not Active",
-        message: "This session is not currently accepting check-ins.",
-    },
-    [CheckinErrorCode.SESSION_FINALIZED]: {
-        title: "Session Finalized",
-        message: "This session has been finalized and cannot accept new check-ins.",
-    },
-    [CheckinErrorCode.ALREADY_CHECKED_IN]: {
-        title: "Already Checked In",
-        message: "You have already checked in to this session.",
-    },
-    [CheckinErrorCode.SESSION_NOT_FOUND]: {
-        title: "Session Not Found",
-        message: "The session you're trying to check in to could not be found.",
-    },
-    [CheckinErrorCode.CLASS_NOT_FOUND]: {
-        title: "Class Not Found",
-        message: "The class for this session could not be found.",
-    },
-    [CheckinErrorCode.UNKNOWN_ERROR]: {
-        title: "Check-In Failed",
-        message: "An unexpected error occurred. Please try again or contact your teacher.",
-    },
-};
-
 // ─── Check-In Page ────────────────────────────────────────────────────────────
 
 /**
@@ -63,6 +27,8 @@ const ERROR_MESSAGES: Record<CheckinErrorCode, { title: string; message: string 
  */
 export function CheckinPage({ sessionId, token }: CheckinPageProps) {
     const { user } = useAuth();
+    const t = useTranslations("checkin");
+    const tCommon = useTranslations("common");
     const [state, setState] = useState<CheckinState>("loading");
     const [errorCode, setErrorCode] = useState<CheckinErrorCode | null>(null);
 
@@ -93,6 +59,28 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
         performCheckin();
     }, [sessionId, token, user]);
 
+    // Helper to get error translation keys
+    const getErrorKeys = (code: CheckinErrorCode | null) => {
+        switch (code) {
+            case CheckinErrorCode.INVALID_TOKEN:
+                return { title: "invalidToken", message: "invalidTokenDesc" };
+            case CheckinErrorCode.EXPIRED_TOKEN:
+                return { title: "expiredToken", message: "expiredTokenDesc" };
+            case CheckinErrorCode.SESSION_NOT_ACTIVE:
+                return { title: "sessionNotActive", message: "sessionNotActiveDesc" };
+            case CheckinErrorCode.SESSION_FINALIZED:
+                return { title: "sessionFinalized", message: "sessionFinalizedDesc" };
+            case CheckinErrorCode.ALREADY_CHECKED_IN:
+                return { title: "alreadyCheckedIn", message: "alreadyCheckedInDesc" };
+            case CheckinErrorCode.SESSION_NOT_FOUND:
+                return { title: "sessionNotFound", message: "sessionNotFoundDesc" };
+            case CheckinErrorCode.CLASS_NOT_FOUND:
+                return { title: "classNotFound", message: "classNotFoundDesc" };
+            default:
+                return { title: "failed", message: "failedDesc" };
+        }
+    };
+
     // Loading state
     if (state === "loading") {
         return (
@@ -100,10 +88,10 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
                 <div className="bg-ivory whisper-shadow border-border/40 w-full max-w-md space-y-6 rounded-[32px] border p-10 text-center">
                     <Loader2 className="text-terracotta mx-auto h-16 w-16 animate-spin" />
                     <Heading size="3" className="font-serif">
-                        Checking you in...
+                        {t("checkingIn")}
                     </Heading>
                     <Text size="3" color="olive">
-                        Please wait while we verify your check-in.
+                        {t("verifyCheckin")}
                     </Text>
                 </div>
             </div>
@@ -119,18 +107,17 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
                         <CheckCircle className="h-12 w-12 text-green-600" />
                     </div>
                     <Heading size="2" className="font-serif">
-                        Check-In Successful!
+                        {t("success")}
                     </Heading>
                     <Text size="4" color="olive" className="leading-relaxed">
-                        You have been successfully checked in to this session. You may close this
-                        page.
+                        {t("successDesc")}
                     </Text>
                     <Button
                         onClick={() => window.close()}
                         variant="outline"
                         className="mt-6 w-full"
                     >
-                        Close
+                        {t("close")}
                     </Button>
                 </div>
             </div>
@@ -138,9 +125,7 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
     }
 
     // Error state
-    const errorInfo = errorCode
-        ? ERROR_MESSAGES[errorCode]
-        : ERROR_MESSAGES[CheckinErrorCode.UNKNOWN_ERROR];
+    const errorKeys = getErrorKeys(errorCode);
 
     return (
         <div className="bg-background flex min-h-screen items-center justify-center p-6">
@@ -149,17 +134,17 @@ export function CheckinPage({ sessionId, token }: CheckinPageProps) {
                     <XCircle className="h-12 w-12 text-red-600" />
                 </div>
                 <Heading size="2" className="font-serif">
-                    {errorInfo.title}
+                    {t(errorKeys.title)}
                 </Heading>
                 <Text size="4" color="olive" className="leading-relaxed">
-                    {errorInfo.message}
+                    {t(errorKeys.message)}
                 </Text>
                 <Button
                     onClick={() => window.location.reload()}
                     variant="outline"
                     className="mt-6 w-full"
                 >
-                    Try Again
+                    {tCommon("tryAgain")}
                 </Button>
             </div>
         </div>

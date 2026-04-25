@@ -1,4 +1,5 @@
 import {
+    deleteDoc,
     doc,
     getDoc,
     getDocs,
@@ -126,12 +127,16 @@ export const memberApi = {
      * @param classId - The class document ID
      * @param userId - The user ID to add
      * @param role - Role to assign (default: "student")
+     * @param displayName - User's display name (optional, for teachers/TAs)
+     * @param email - User's email (optional, for teachers/TAs)
      * @throws Error if member already exists or write fails
      */
     addMember: async (
         classId: string,
         userId: string,
         role: ClassRole = "student",
+        displayName?: string,
+        email?: string,
     ): Promise<void> => {
         try {
             const memberRef = doc(Collections.classMembers(classId), userId);
@@ -145,6 +150,8 @@ export const memberApi = {
             await setDoc(memberRef, {
                 userId,
                 role,
+                displayName,
+                email,
                 addedAt: serverTimestamp(),
             });
         } catch (error) {
@@ -153,6 +160,40 @@ export const memberApi = {
                 throw error;
             }
             throw new Error("Failed to add member to class");
+        }
+    },
+
+    /**
+     * Remove a member from a class (hard delete).
+     * Also deactivates their enrollment if they are a student.
+     *
+     * @param classId - The class document ID
+     * @param userId - The user ID to remove
+     * @throws Error if member not found or delete fails
+     *
+     * @example
+     * ```ts
+     * await memberApi.removeMember(classId, userId);
+     * ```
+     */
+    removeMember: async (classId: string, userId: string): Promise<void> => {
+        try {
+            const memberRef = doc(Collections.classMembers(classId), userId);
+
+            // Check if member exists
+            const memberSnap = await getDoc(memberRef);
+            if (!memberSnap.exists()) {
+                throw new Error("Member not found in this class");
+            }
+
+            // Delete the member document
+            await deleteDoc(memberRef);
+        } catch (error) {
+            console.error("[memberApi.removeMember] Failed to remove member:", error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to remove member from class");
         }
     },
 };

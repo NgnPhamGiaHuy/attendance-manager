@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Key, Loader2 } from "lucide-react";
@@ -21,8 +21,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/typography";
 import { useJoinClass } from "@/features/classes/hooks/useClasses";
+import { useRouter } from "@/i18n/routing";
 
 export function JoinClassDialog() {
+    const t = useTranslations("classes");
+    const tCommon = useTranslations("common");
     const [open, setOpen] = useState(false);
     const [code, setCode] = useState("");
     const joinClass = useJoinClass();
@@ -35,7 +38,7 @@ export function JoinClassDialog() {
         const cleanCode = code.replace(/[^A-Z0-9]/gi, "").toUpperCase();
 
         if (cleanCode.length !== 6) {
-            toast.error("Class code must be exactly 6 characters.");
+            toast.error(t("joinError"));
             return;
         }
 
@@ -44,16 +47,14 @@ export function JoinClassDialog() {
             const formattedCode = `${cleanCode.slice(0, 2)}-${cleanCode.slice(2)}`;
 
             const classId = await joinClass.mutateAsync(formattedCode);
-            toast.success("Successfully joined the class!");
+            toast.success(t("joinSuccess"));
             setOpen(false);
             setCode("");
             // Send the user directly to the new class
             router.push(`/classes/${classId}`);
         } catch (error: any) {
             console.error(error);
-            toast.error(
-                error.message || "Failed to join class. Please check the code and try again.",
-            );
+            toast.error(error.message || t("joinFailed"));
         }
     };
 
@@ -63,19 +64,19 @@ export function JoinClassDialog() {
                 render={
                     <Button
                         variant="outline"
-                        className="whisper-shadow border-border/60 hover:bg-ivory rounded-xl px-6"
+                        className="whisper-shadow border-border/60 hover:bg-ivory h-11 rounded-xl px-6 text-sm font-medium"
                     >
                         <Key className="mr-2.5 h-4 w-4" />
-                        Join Class
+                        {t("join")}
                     </Button>
                 }
             />
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Join Class</DialogTitle>
+                    <DialogTitle>{t("joinTitle")}</DialogTitle>
                     <DialogDescription>
                         <Text size="4" color="olive" className="leading-relaxed">
-                            Enter the 6-character class code provided by your instructor to join.
+                            {t("joinDesc")}
                         </Text>
                     </DialogDescription>
                 </DialogHeader>
@@ -86,7 +87,7 @@ export function JoinClassDialog() {
                             htmlFor="code"
                             className="text-stone-gray ml-1 text-xs font-bold tracking-widest uppercase"
                         >
-                            Class Code
+                            {t("joinCode")}
                         </Label>
                         <Input
                             id="code"
@@ -108,7 +109,7 @@ export function JoinClassDialog() {
                                     variant="ghost"
                                     className="text-stone-gray rounded-xl px-6 font-serif"
                                 >
-                                    Cancel
+                                    {tCommon("cancel")}
                                 </Button>
                             }
                         />
@@ -120,7 +121,7 @@ export function JoinClassDialog() {
                             {joinClass.isPending && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             )}
-                            Join
+                            {tCommon("join")}
                         </Button>
                     </DialogFooter>
                 </form>

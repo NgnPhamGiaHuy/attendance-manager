@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
 import { ArrowRight, CheckCircle2, QrCode, Zap } from "lucide-react";
@@ -11,11 +10,13 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-chip";
 import { Heading, Text } from "@/components/ui/typography";
+import { Link, useRouter } from "@/i18n/routing";
 import { useAuth } from "@/providers/auth-provider";
 
 export function LandingPage() {
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
+    const t = useTranslations("landing");
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
@@ -38,20 +39,23 @@ export function LandingPage() {
                     className="border-terracotta/20 bg-terracotta/5 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 uppercase"
                 >
                     <Zap className="fill-terracotta h-3.5 w-3.5" />
-                    Built for modern classrooms
+                    {t("tagline")}
                 </Heading>
-                <Heading size="9" as="h1" className="max-w-5xl">
-                    Attendance, designed <br /> for humans.
+                <Heading size="9" as="h1" align="center" className="max-w-5xl">
+                    {t.rich("heroTitle", {
+                        br: () => <br />,
+                    })}
                 </Heading>
                 <Text
                     size="6"
                     color="olive"
+                    align="center"
                     className="mt-10 max-w-2xl leading-relaxed md:text-2xl"
                     as="p"
                 >
-                    The only attendance platform that understands teaching.{" "}
-                    <br className="hidden md:block" />
-                    Focus on your students, not the paperwork.
+                    {t.rich("heroDesc", {
+                        br: (chunks) => <br className="hidden md:block" />,
+                    })}
                 </Text>
                 <div className="mt-14 flex flex-wrap justify-center gap-6">
                     <Button
@@ -60,7 +64,7 @@ export function LandingPage() {
                         className="whisper-shadow h-14 rounded-2xl px-12 font-serif text-lg"
                     >
                         <Link href="/login">
-                            Start your first class
+                            {t("startClass")}
                             <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </Link>
                     </Button>
@@ -70,7 +74,7 @@ export function LandingPage() {
                         variant="secondary"
                         className="border-border/60 h-14 rounded-2xl border px-12 font-serif text-lg"
                     >
-                        <Link href="/demo">View the demo</Link>
+                        <Link href="/demo">{t("viewDemo")}</Link>
                     </Button>
                 </div>
             </header>
@@ -82,11 +86,10 @@ export function LandingPage() {
                         <CheckCircle2 className="text-terracotta h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
-                        Exception-based Reporting
+                        {t("f1Title")}
                     </Heading>
                     <Text color="olive" className="leading-relaxed">
-                        Don&apos;t waste time marking everyone &quot;Present&quot;. We assume they
-                        are here—you only tap when they aren&apos;t.
+                        {t("f1Desc")}
                     </Text>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -94,11 +97,10 @@ export function LandingPage() {
                         <Zap className="text-terracotta h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
-                        Real-time State Sync
+                        {t("f2Title")}
                     </Heading>
                     <Text color="olive" className="leading-relaxed">
-                        Collaborative marking for large lecture halls. See updates from co-teachers
-                        and TAs across devices instantly.
+                        {t("f2Desc")}
                     </Text>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -106,11 +108,10 @@ export function LandingPage() {
                         <QrCode className="text-terracotta h-6 w-6" />
                     </div>
                     <Heading size="4" as="h3">
-                        Secure QR Check-in
+                        {t("f3Title")}
                     </Heading>
                     <Text color="olive" className="leading-relaxed">
-                        Prevent proxy attendance with time-rotating, cryptographically secure QR
-                        codes. Students self-verify with ease.
+                        {t("f3Desc")}
                     </Text>
                 </div>
             </section>
@@ -127,19 +128,19 @@ export function LandingPage() {
                                 color="stone"
                                 className="tracking-widest uppercase"
                             >
-                                Active Session
+                                {t("activeSession")}
                             </Text>
-                            <Heading size="5">Advanced Data Structures · Lecture 12</Heading>
+                            <Heading size="5">{t("mockTitle")}</Heading>
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="bg-background border-border/40 flex h-11 items-center rounded-xl border px-5 font-serif text-sm font-medium">
-                                Mark All Present
+                                {t("markAllPresent")}
                             </div>
                             <Button
                                 size="lg"
                                 className="bg-terracotta h-11 rounded-xl font-serif shadow-sm"
                             >
-                                Finish Session
+                                {t("finishSession")}
                             </Button>
                         </div>
                     </div>
@@ -148,31 +149,38 @@ export function LandingPage() {
                     <div className="divide-border/20 flex flex-col divide-y px-10 pt-4">
                         {[
                             {
-                                name: "Julianne Moore",
+                                key: "s1",
+                                name: t("mockStudent1"),
                                 status: "Present",
                                 color: "#16a34a",
-                                initials: "JM",
+                                initials: "LA",
                             },
                             {
-                                name: "Robert De Niro",
+                                key: "s2",
+                                name: t("mockStudent2"),
                                 status: "Late",
                                 color: "#d97706",
-                                initials: "RD",
+                                initials: "TB",
                             },
                             {
-                                name: "Meryl Streep",
+                                key: "s3",
+                                name: t("mockStudent3"),
                                 status: "Present",
                                 color: "#16a34a",
-                                initials: "MS",
+                                initials: "NC",
                             },
                             {
-                                name: "Denzel Washington",
+                                key: "s4",
+                                name: t("mockStudent4"),
                                 status: "Absent",
                                 color: "#dc2626",
-                                initials: "DW",
+                                initials: "TD",
                             },
-                        ].map((student, i) => (
-                            <div key={i} className="flex items-center justify-between py-5">
+                        ].map((student) => (
+                            <div
+                                key={student.key}
+                                className="flex items-center justify-between py-5"
+                            >
                                 <div className="flex items-center gap-5">
                                     <div className="bg-near-black/5 text-near-black flex h-12 w-12 items-center justify-center rounded-2xl font-serif text-sm font-medium">
                                         {student.initials}

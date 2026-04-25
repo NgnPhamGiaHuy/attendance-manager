@@ -105,6 +105,9 @@ export interface ClassMember {
     userId: string;
     role: ClassRole;
     addedAt: FirestoreDate;
+    displayName?: string; // User's display name (for teachers/TAs without enrollment)
+    email?: string; // User's email (for teachers/TAs without enrollment)
+    isArchivedForUser?: boolean; // User-specific archive flag (hides from their dashboard)
 }
 
 // --- Enrollment ---

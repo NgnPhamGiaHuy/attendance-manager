@@ -91,7 +91,7 @@ function DropdownMenuItem({
             data-inset={inset}
             data-variant={variant}
             className={cn(
-                "group/dropdown-menu-item focus:bg-background focus:text-near-black not-data-[variant=destructive]:focus:**:text-near-black data-[variant=destructive]:text-terracotta data-[variant=destructive]:focus:bg-terracotta/5 data-[variant=destructive]:focus:text-terracotta data-[variant=destructive]:*:[svg]:text-terracotta relative flex cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-9 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5",
+                "group/dropdown-menu-item focus:bg-background focus:text-near-black not-data-[variant=destructive]:focus:**:text-near-black data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/5 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive relative flex cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-9 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5",
                 className,
             )}
             {...props}
@@ -223,7 +223,7 @@ function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.
     return (
         <MenuPrimitive.Separator
             data-slot="dropdown-menu-separator"
-            className={cn("bg-border/30 -mx-2 my-2 h-px", className)}
+            className={cn("bg-stone-gray/20 mx-2 my-1.5 h-px", className)}
             {...props}
         />
     );

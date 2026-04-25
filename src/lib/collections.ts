@@ -3,7 +3,6 @@ import { collection, CollectionReference, DocumentData } from "firebase/firestor
 import { db } from "@/lib/firebase";
 
 import type {
-    AppUser,
     AttendanceRecord,
     Class,
     ClassAnalytics,
@@ -24,7 +23,6 @@ function typedCollection<T = DocumentData>(
 }
 
 export const Collections = {
-    users: () => typedCollection<AppUser>("users"),
     classes: () => typedCollection<Class>("classes"),
     classMembers: (classId: string) => typedCollection<ClassMember>(`classes/${classId}/members`),
     enrollments: () => typedCollection<Enrollment>("enrollments"),

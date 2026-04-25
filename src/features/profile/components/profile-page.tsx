@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { PageContainer, PageHeader } from "@/components/layout/app-shell";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,25 +14,21 @@ import { useAuth } from "@/providers/auth-provider";
 
 export function ProfilePage() {
     const { user } = useAuth();
+    const t = useTranslations("auth");
+    const tCommon = useTranslations("common");
 
     if (!user) return null;
 
     return (
         <PageContainer narrow>
-            <PageHeader
-                title="Your Profile"
-                description="Manage your personal information and preferences."
-                className="mb-8"
-            />
+            <PageHeader title={t("profile")} description={t("manageProfile")} className="mb-8" />
 
             <div className="space-y-12">
                 {/* Personal Information Card */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Personal Information</CardTitle>
-                        <CardDescription>
-                            Your basic profile details visible to others in your classes.
-                        </CardDescription>
+                        <CardTitle>{t("personalInfo")}</CardTitle>
+                        <CardDescription>{t("basicDetails")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-10">
                         <div className="flex items-center gap-6">
@@ -48,10 +44,10 @@ export function ProfilePage() {
                             </Avatar>
                             <div className="space-y-1">
                                 <Button variant="outline" size="sm" className="rounded-xl px-4">
-                                    Change Avatar
+                                    {t("changeAvatar")}
                                 </Button>
                                 <Text size="1" color="stone" className="block">
-                                    Recommended size: 256x256px
+                                    {t("recommendedSize")}
                                 </Text>
                             </div>
                         </div>
@@ -62,12 +58,12 @@ export function ProfilePage() {
                                     htmlFor="fullName"
                                     className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
-                                    Full Name
+                                    {t("fullName")}
                                 </Label>
                                 <Input
                                     id="fullName"
                                     defaultValue={user.displayName}
-                                    placeholder="Enter your name"
+                                    placeholder={tCommon("appName")}
                                     className="h-12"
                                 />
                             </div>
@@ -76,7 +72,7 @@ export function ProfilePage() {
                                     htmlFor="email"
                                     className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase"
                                 >
-                                    Email Address
+                                    {t("emailAddress")}
                                 </Label>
                                 <Input
                                     id="email"
@@ -86,13 +82,15 @@ export function ProfilePage() {
                                     className="bg-background/50 h-12"
                                 />
                                 <Text size="1" color="olive" className="ml-1">
-                                    Email is managed by your authentication provider.
+                                    {t("emailManaged")}
                                 </Text>
                             </div>
                         </div>
 
                         <div className="border-border/40 flex justify-end border-t pt-4">
-                            <Button className="whisper-shadow rounded-xl">Save Changes</Button>
+                            <Button className="whisper-shadow rounded-xl">
+                                {tCommon("saveChanges")}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -100,16 +98,14 @@ export function ProfilePage() {
                 {/* Account Details Card */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Account Details</CardTitle>
-                        <CardDescription>
-                            System information related to your account.
-                        </CardDescription>
+                        <CardTitle>{tCommon("actions")}</CardTitle>
+                        <CardDescription>{t("basicDetails")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-10">
                         <div className="grid gap-10 sm:grid-cols-2">
                             <div className="space-y-2">
                                 <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
-                                    Role
+                                    {t("role")}
                                 </Label>
                                 <div className="border-border/60 bg-ivory text-near-black flex h-12 w-full items-center rounded-xl border px-4 py-2 text-base capitalize">
                                     {user.role}
@@ -117,7 +113,7 @@ export function ProfilePage() {
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-stone-gray ml-1 text-[11px] font-bold tracking-widest uppercase">
-                                    Account ID
+                                    {t("accountId")}
                                 </Label>
                                 <div className="border-border/60 bg-ivory text-stone-gray flex h-12 w-full items-center rounded-xl border px-4 py-2 font-mono text-base text-sm">
                                     {user.uid}

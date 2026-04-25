@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
 import { QRCodeSVG } from "qrcode.react";
@@ -53,6 +54,7 @@ export function QRCodeModal({
     isOpen,
     onClose,
 }: QRCodeModalProps) {
+    const t = useTranslations("sessions");
     const [isActivating, setIsActivating] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [secondsRemaining, setSecondsRemaining] = useState(0);
@@ -85,27 +87,27 @@ export function QRCodeModal({
         setIsActivating(true);
         try {
             await sessionApi.activateQR(sessionId);
-            toast.success("QR check-in activated");
+            toast.success(t("updateSuccess"));
         } catch (error) {
-            toast.error("Failed to activate QR check-in");
+            toast.error(t("updateFailed"));
             console.error("QR activation error:", error);
         } finally {
             setIsActivating(false);
         }
-    }, [sessionId]);
+    }, [sessionId, t]);
 
     const handleRefresh = useCallback(async () => {
         setIsRefreshing(true);
         try {
             await sessionApi.refreshQR(sessionId);
-            toast.success("QR code refreshed");
+            toast.success(t("updateSuccess"));
         } catch (error) {
-            toast.error("Failed to refresh QR code");
+            toast.error(t("updateFailed"));
             console.error("QR refresh error:", error);
         } finally {
             setIsRefreshing(false);
         }
-    }, [sessionId]);
+    }, [sessionId, t]);
 
     // Build full URL for QR code
     const checkinUrl = qrSecret
@@ -121,10 +123,8 @@ export function QRCodeModal({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="border-border/40 bg-ivory whisper-shadow max-w-2xl rounded-[32px] p-10">
                 <DialogHeader>
-                    <DialogTitle className="font-serif text-2xl">QR Check-In</DialogTitle>
-                    <DialogDescription className="leading-relaxed">
-                        Students can scan this QR code to check in to the session.
-                    </DialogDescription>
+                    <DialogTitle className="font-serif text-2xl">{t("qrTitle")}</DialogTitle>
+                    <DialogDescription className="leading-relaxed">{t("qrDesc")}</DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6 pt-4">
@@ -132,7 +132,7 @@ export function QRCodeModal({
                         // Not activated yet
                         <div className="flex flex-col items-center justify-center space-y-6 py-12">
                             <Text size="4" color="olive" className="text-center">
-                                QR check-in is not active for this session.
+                                {t("qrNotActive")}
                             </Text>
                             <Button
                                 onClick={handleActivate}
@@ -140,7 +140,7 @@ export function QRCodeModal({
                                 size="lg"
                                 className="h-12 px-8 font-serif text-base"
                             >
-                                {isActivating ? "Activating..." : "Activate QR Check-In"}
+                                {isActivating ? t("activating") : t("activateQR")}
                             </Button>
                         </div>
                     ) : (
@@ -164,7 +164,7 @@ export function QRCodeModal({
                                         color="stone"
                                         className="mb-1 tracking-widest uppercase"
                                     >
-                                        Expires In
+                                        {t("expiresIn")}
                                     </Text>
                                     <Heading
                                         size="3"
@@ -182,7 +182,7 @@ export function QRCodeModal({
                             {/* Fallback URL */}
                             <div className="bg-background/50 border-border/30 space-y-2 rounded-xl border p-4">
                                 <Text size="2" weight="bold" color="stone" className="uppercase">
-                                    Manual Check-In URL
+                                    {t("manualUrl")}
                                 </Text>
                                 <Text size="2" className="text-olive-gray font-mono break-all">
                                     {checkinUrl}
@@ -192,14 +192,14 @@ export function QRCodeModal({
                             {/* Actions */}
                             <div className="flex justify-end gap-3">
                                 <Button variant="outline" onClick={onClose}>
-                                    Close
+                                    {t("deselectAll")}
                                 </Button>
                                 <Button
                                     onClick={handleRefresh}
                                     disabled={isRefreshing}
                                     className="font-serif"
                                 >
-                                    {isRefreshing ? "Refreshing..." : "Refresh QR Code"}
+                                    {isRefreshing ? t("refreshing") : t("refreshQR")}
                                 </Button>
                             </div>
                         </>
